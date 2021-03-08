@@ -2,13 +2,16 @@ import React, { useEffect } from 'react';
 import Chartjs from 'chart.js';
 
 /* LineChart component. It expects the following imput:
-*  - labels
-*  - chartData
-*  - backgroundColor
-*  - chartLabel
+*  - type: the type of chart to make (e.g. 'line', 'scatter')
+*  - labels: x-axis names.
+*  - chartData: the data to plot.
+*  - backgroundColor: the color of the line or the data points
+*  - chartLabel: name of the data for in the legend.
 *  */
 
-const LineChart = ({
+const Chart = ({
+                   type,
+                   ctx,
                    labels,
                    chartData = [],
                    backgroundColor,
@@ -25,18 +28,19 @@ const LineChart = ({
     };
 
     const chartConfig = {
-        type: 'line',
+        type: type,
         data: data,
     };
 
     useEffect(() => {
-        new Chartjs("myChart", chartConfig);
+        new Chartjs(ctx, chartConfig);
     });
+
     return (
         <div>
-            <canvas id="myChart" width="200" height="200"/>
+            <canvas id={ctx} width="200" height="200"/>
         </div>
     );
 };
 
-export default LineChart;
+export default Chart;
