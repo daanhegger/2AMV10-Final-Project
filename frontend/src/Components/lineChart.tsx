@@ -1,12 +1,18 @@
 import React, { useEffect } from 'react';
 import Chartjs from 'chart.js';
 
+/* LineChart component. It expects the following imput:
+*  - labels
+*  - chartData
+*  - backgroundColor
+*  - chartLabel
+*  */
+
 const LineChart = ({
                    labels,
                    chartData = [],
                    backgroundColor,
                    chartLabel = null,
-                   ctx,
                }:any) => {
 
     const data:any = {
@@ -24,7 +30,7 @@ const LineChart = ({
     };
 
     useEffect(() => {
-        new Chartjs(ctx, chartConfig);
+        new Chartjs("myChart", chartConfig);
     });
     return (
         <div>
