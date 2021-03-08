@@ -93,7 +93,11 @@ function App() {
           </Grid>
           <Grid item xs={3}>
             <div>
-              <Card>
+              <Card className="set-vectorized-parameters">
+                {/*set parameters for vectorization*/}
+                {renderCheckboxesCard()}
+              </Card>
+              <Card className="set-words-topics" style={{marginTop: "3em"}}>
                 {renderCheckboxesCard()}
               </Card>
             </div>
