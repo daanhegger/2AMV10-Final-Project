@@ -72,12 +72,3 @@ def get_word2vec_vectors():
     ]
 
     return rows
-
-
-if __name__ == "__main__":
-    df = pd.read_csv("/Users/daanhegger/Google Drive/Data Science in Engineering/2AMV10 Visual Analytics/YInt.csv")
-    print(df.head())
-    # init_word2vec(df)
-    print(
-        get_word2vec_vectors()
-    )

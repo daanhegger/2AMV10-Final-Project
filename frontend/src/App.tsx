@@ -20,19 +20,13 @@ const labels = [
 ];
 const dataDummies = [5, 9, 3, 5, 2, 3, 1];
 
-let dataDummies2: any[] = [];
-for (let i = 0; i < 1000; i++) {
-  dataDummies2.push({
-    x: Math.random() * Math.floor(10),
-    y: Math.random() * Math.floor(10),
-  });
-}
-
 function App() {
-  const [{ data, loading, error }] = useAxios("http://localhost:5000");
+  const [{ data, loading, error }] = useAxios<string[][]>(
+    "http://localhost:5000/word2vec"
+  );
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error!</p>;
+  if (error || !data) return <p>Error!</p>;
 
   // const paramsTitle = (
   //     <Typography variant="h6" component="h1">
@@ -77,6 +71,13 @@ function App() {
     );
   };
 
+  const dataForScatter = data.map((row) => ({
+    x: parseFloat(row[0]),
+    y: parseFloat(row[1]),
+  }));
+
+  const dataWords = data.map((row) => row[2]);
+
   return (
     <div className="App">
       <Grid container spacing={2}>
@@ -96,9 +97,10 @@ function App() {
                 </Grid>
                 <Grid item xs={6}>
                   <Chart
+                    labels={dataWords}
                     type={"scatter"}
                     ctx={"scatterChart"}
-                    chartData={dataDummies2}
+                    chartData={dataForScatter}
                     backgroundColor={"#AEBBFF"}
                     chartLabel={"occurance"}
                   />

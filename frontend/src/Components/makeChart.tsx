@@ -31,6 +31,24 @@ const Chart = ({
   const chartConfig = {
     type: type,
     data: data,
+    options: {
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem: any, data: any) {
+            console.log(data);
+            var label = data.labels[tooltipItem.index];
+            return (
+              label +
+              ": (" +
+              tooltipItem.xLabel +
+              ", " +
+              tooltipItem.yLabel +
+              ")"
+            );
+          },
+        },
+      },
+    },
   };
 
   useEffect(() => {
