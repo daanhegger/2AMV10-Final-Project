@@ -1,17 +1,10 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    Input,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-} from "@material-ui/core";
+import React from 'react';
+import {Card} from "@material-ui/core";
 import useAxios from "axios-hooks"
 import Chart from "./Components/makeChart";
 import Grid from '@material-ui/core/Grid';
+import {SelectWordsCard} from "./Components/selectWords";
+import {SetAlgoParamsCard} from "./Components/setAlgoParams";
 
 //Dummie data for the line/scatter chart
 const labels = [
@@ -26,31 +19,7 @@ const labels = [
 const dataDummies = [5, 9, 3, 5, 2, 3, 1];
 
 function App() {
-    const [vectorization, setVectorApproach] = useState('k-NN');
-    const selectAlgorithm = useCallback((e) => setVectorApproach(e.target.value as string), [setVectorApproach])
-
-
-    const [numberOfNeighbors, setNumOfNeighbors] = useState(4)
-    const setNumberOfNeighbors = useCallback((e) => setNumOfNeighbors(e.target.value as number), [setNumOfNeighbors]);
-    const knnParamsOn = useMemo(() => vectorization === 'k-NN' ? 'inline' : 'none', [vectorization])
-
-    const [topicsList, setTopicList] = useState([]);
-    const handleChange = useCallback((e) => setTopicList(e.target.value), [setTopicList]);
-
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-    const MenuProps = {
-        PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                width: 250,
-            },
-        },
-    };
-
-
     const algoChoices = ['k-NN', 'algo-2', 'alg-3']
-
 
     const [{ data, loading, error }] = useAxios(
         'http://localhost:5000/word2vec'
@@ -73,7 +42,6 @@ function App() {
     "word 9",
     "word 10",
   ];
-    console.log(data)
 
   const dataForScatter = data.map((row: any[]) => ({
     x: parseFloat(row[0]),
@@ -118,42 +86,8 @@ function App() {
           </Grid>
           <Grid item xs={3}>
             <div>
-              <Card className="set-vectorized-parameters">
-                <CardHeader title="Select algorithm for vectorization"/>
-                <CardContent>
-                 <InputLabel id="set-vectorized-approach">Algorithm</InputLabel>
-                    <Select
-                      labelId="set-vectorized-approach"
-                      id="select-algo"
-                      value={vectorization}
-                      onChange={selectAlgorithm}
-                      style={{width: "20%", marginRight: '2em'}}
-                    >
-                      {algoChoices.map(choice => <MenuItem value={choice}>{choice}</MenuItem>)}
-                    </Select>
-                    <TextField id="set-kNN-params" value={numberOfNeighbors}
-                               style={{width: "20%", display: knnParamsOn}} onChange={setNumberOfNeighbors}/>
-
-                  </CardContent>
-              </Card>
-              <Card className="set-words-topics" style={{marginTop: "3em"}}>
-                  <CardHeader title="Select words for future investigation"/>
-                    <InputLabel id="dselect-topics-list" style={{marginLeft: "1em"}}>Topics</InputLabel>
-                    <Select
-                        labelId="demo-mutiple-name-label"
-                        id="demo-mutiple-name"
-                        multiple
-                        value={topicsList}
-                        onChange={handleChange}
-                        input={<Input />}
-                        MenuProps={MenuProps}
-                        style={{marginLeft: "1em", marginBottom: "2em"}}
-                    >
-                        {words.map((name) => (
-                            <MenuItem key={name} value={name}>{name}</MenuItem>
-                        ))}
-                    </Select>
-              </Card>
+                <SetAlgoParamsCard algoChoices={algoChoices}/>
+                <SelectWordsCard words={words}/>
             </div>
           </Grid>
         </Grid>
