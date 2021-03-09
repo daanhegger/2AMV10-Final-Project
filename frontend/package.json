@@ -47,6 +47,7 @@
     ]
   },
   "devDependencies": {
-    "@types/chart.js": "^2.9.31"
+    "@types/chart.js": "^2.9.31",
+    "prettier": "2.2.1"
   }
 }
