@@ -1,10 +1,9 @@
-import {Card, CardHeader, Input, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {Card, CardHeader, MenuItem, Select, Typography} from "@material-ui/core";
 import React, {useCallback, useState} from "react";
 
 export const SelectWordsCard = (props: any) => {
     const [topicsList, setTopicList] = useState([]);
     const handleChange = useCallback((e) => setTopicList(e.target.value), [setTopicList]);
-
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
     const MenuProps = {
@@ -18,16 +17,15 @@ export const SelectWordsCard = (props: any) => {
    return (
        <Card className="set-words-topics" style={{marginTop: "3em"}}>
            <CardHeader title="Select words for future investigation"/>
-           <InputLabel id="dselect-topics-list" style={{marginLeft: "1em"}}>Topics</InputLabel>
+           <Typography style={{marginLeft: "1em"}} gutterBottom>Top 20 words</Typography>
            <Select
-               labelId="demo-mutiple-name-label"
-               id="demo-mutiple-name"
+               id="select-list"
                multiple
                value={topicsList}
                onChange={handleChange}
-               input={<Input />}
                MenuProps={MenuProps}
-               style={{marginLeft: "1em", marginBottom: "2em"}}
+               placeholder='Select words from the top lis'
+               style={{padding: "0em 0em 1em 1em", width: "90%"}}
            >
                {props.words.map((name: any) => (
                    <MenuItem key={name} value={name}>{name}</MenuItem>
