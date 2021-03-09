@@ -5,7 +5,7 @@ from flask_cors import CORS
 import os
 import pandas as pd
 from os import path
-from backend.models.vectorize_words import init_word2vec, get_word2vec_vectors
+from models.vectorize_words import init_word2vec, get_word2vec_vectors
 from flask import jsonify
 
 # Flask

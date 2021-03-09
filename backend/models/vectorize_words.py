@@ -2,7 +2,7 @@ from gensim.models import Word2Vec, FastText
 import pandas as pd
 from nltk.tokenize import TweetTokenizer
 from sklearn.decomposition import PCA
-from backend.preprocess import preprocess
+from preprocess import preprocess
 
 
 # def get_spam():

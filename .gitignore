@@ -1,3 +1,5 @@
+/backend/storage/*
+
 /.DS_Store
 .idea
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,pycharm,webstorm
