@@ -1,5 +1,4 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import {
     Card,
     CardContent,
@@ -9,13 +8,11 @@ import {
     MenuItem,
     Select,
     TextField,
-    Typography
 } from "@material-ui/core";
 import useAxios from "axios-hooks"
 import Chart from "./Components/makeChart";
 import Grid from '@material-ui/core/Grid';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox, { CheckboxProps } from '@material-ui/core/Checkbox';
+
 //Dummie data for the line/scatter chart
 const labels = [
   "Monday",
@@ -56,22 +53,12 @@ function App() {
 
 
     const [{ data, loading, error }] = useAxios(
-        'http://localhost:5000'
+        'http://localhost:5000/word2vec'
     )
 
   if (loading) return <p>Loading...</p>;
   if (error || !data) return <p>Error!</p>;
 
-
-  const GreenCheckbox = withStyles({
-    root: {
-      color: "#ff9191",
-      "&$checked": {
-        color: "#FF9191",
-      },
-    },
-    checked: {},
-  })((props: CheckboxProps) => <Checkbox color="default" {...props} />);
 
   // Dummie words. Need to be changed with the most frequent names/topics from the actual data.
   const words = [
@@ -86,21 +73,9 @@ function App() {
     "word 9",
     "word 10",
   ];
+    console.log(data)
 
-  const renderCheckboxesCard = () => {
-    return (
-      <div>
-        {words.map((word) => (
-          <FormControlLabel
-            control={<GreenCheckbox checked={false} name="checkedG" />}
-            label={word}
-          />
-        ))}
-      </div>
-    );
-  };
-
-  const dataForScatter = data.map((row: string[]) => ({
+  const dataForScatter = data.map((row: any[]) => ({
     x: parseFloat(row[0]),
     y: parseFloat(row[1]),
   }));
