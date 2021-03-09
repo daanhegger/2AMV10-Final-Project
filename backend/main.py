@@ -8,3 +8,7 @@ CORS(app)
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
+@app.route('/word2vec')
+def word2vec():
+    pass
