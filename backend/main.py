@@ -24,7 +24,8 @@ if not dataset_path or not path.exists(dataset_path):
 df = pd.read_csv(dataset_path)
 
 # Initialize and save a word2vec model only once
-# init_word2vec(df)
+if not path.exists("./storage/word2vec.model"):
+    init_word2vec(df)
 
 
 @app.route('/')

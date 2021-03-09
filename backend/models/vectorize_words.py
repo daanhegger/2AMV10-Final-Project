@@ -57,11 +57,11 @@ def init_word2vec(df: pd.DataFrame):
 
     """word2vec"""
     model = generate_word2vec(messages)
-    model.save("~/word2vec.model")
+    model.save("./storage/word2vec.model")
 
 
 def get_word2vec_vectors():
-    model = Word2Vec.load("~/word2vec.model")
+    model = Word2Vec.load("./storage/word2vec.model")
     X = model.wv[model.wv.vocab]
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
