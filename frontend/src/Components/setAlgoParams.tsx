@@ -1,4 +1,4 @@
-import {Card, CardContent, CardHeader, MenuItem, Select, Slider, Typography} from "@material-ui/core";
+import {Button, Card, CardContent, CardHeader, MenuItem, Select, Slider, Typography} from "@material-ui/core";
 import React, {useCallback, useMemo, useState} from "react";
 
 export const SetAlgoParamsCard = (props: any) => {
@@ -10,6 +10,19 @@ export const SetAlgoParamsCard = (props: any) => {
     const [numberOfNeighbors, setNumOfNeighbors] = useState(4)
     const setNumberOfNeighbors = useCallback((e) => setNumOfNeighbors(e.target.value as number), [setNumOfNeighbors]);
     const knnParamsOn = useMemo(() => vectorization === 'k-NN' ? 'block' : 'none', [vectorization])
+
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithm: vectorization, params: [numberOfNeighbors] })
+        };
+        fetch('http://localhost:5000/word2vec', requestOptions)
+            .then(response => response.json())
+    }, [])
+
 
     return(
         <Card className="set-vectorized-parameters">
@@ -37,6 +50,7 @@ export const SetAlgoParamsCard = (props: any) => {
                         onChange={setNumberOfNeighbors}
                     />
                 </div>
+                <Button variant="contained" color="primary" onSubmit={handleSubmit}> Re-generate</Button>
             </CardContent>
         </Card>
     )
