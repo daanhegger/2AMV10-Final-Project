@@ -1,36 +1,34 @@
-import {Card, CardHeader, MenuItem, Select, Typography} from "@material-ui/core";
+import { Card, CardHeader, Chip, TextField } from "@material-ui/core";
 import React, {useCallback, useState} from "react";
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 export const SelectWordsCard = (props: any) => {
-    const [topicsList, setTopicList] = useState([]);
-    const handleChange = useCallback((e) => setTopicList(e.target.value), [setTopicList]);
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-    const MenuProps = {
-        PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                width: 250,
-            },
-        },
-    };
+    const { words } = props
+    const [topicsList, setTopicList] = useState<string[]>([]);
+    const handleChange = useCallback((e, newValue) => setTopicList(newValue), [setTopicList, topicsList]);
+
    return (
        <Card className="set-words-topics" style={{marginTop: "3em"}}>
            <CardHeader title="Select words for future investigation"/>
-           <Typography style={{marginLeft: "1em"}} gutterBottom>Top 20 words</Typography>
-           <Select
+           <Autocomplete
                id="select-list"
                multiple
-               value={topicsList}
-               onChange={handleChange}
-               MenuProps={MenuProps}
-               placeholder='Select words from the top lis'
+               freeSolo
+               options={words}
+               renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                    ))
+               }
                style={{padding: "0em 0em 1em 1em", width: "90%"}}
-           >
-               {props.words.map((name: any) => (
-                   <MenuItem key={name} value={name}>{name}</MenuItem>
-               ))}
-           </Select>
+               onChange={handleChange}
+               renderInput={(params) => (
+                <TextField
+                    {...params}
+                    variant="standard"
+                    label="Select words or input the one you want to investigate"
+                />)}
+           />
        </Card>
    )
 }
