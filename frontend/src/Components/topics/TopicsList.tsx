@@ -11,6 +11,7 @@ import {
   makeStyles,
   Theme,
 } from "@material-ui/core";
+import { Topic } from "../../models";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
