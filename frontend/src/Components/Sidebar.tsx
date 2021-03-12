@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import TopicsList from "./topics/TopicsList";
+import TweetListContainer from "./tweets/TweetListContainer";
 
 /**
  * Content the sidebar (drawer)
@@ -40,7 +41,7 @@ const Sidebar: React.FC = () => {
       )}
 
       {/* 1: Tweet inpection view */}
-      {value === 1 && <p>Tweet view, todo</p>}
+      {value === 1 && <TweetListContainer />}
     </>
   );
 };

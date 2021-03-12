@@ -5,13 +5,9 @@ import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import {
-  createStyles,
-  FormControlLabel,
-  makeStyles,
-  Theme,
-} from "@material-ui/core";
+import { createStyles, FormControlLabel, makeStyles, Theme } from "@material-ui/core";
 import { Topic } from "../../models";
+import truncate from "../../utils/truncate";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,16 +44,8 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
   return (
     <>
       {topics.map((topic) => (
-        <Accordion
-          key={topic.title}
-          square
-          elevation={0}
-          className={classes.accordion}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            classes={{ content: classes.accordionSummary }}
-          >
+        <Accordion key={topic.title} square elevation={0} className={classes.accordion}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} classes={{ content: classes.accordionSummary }}>
             <FormControlLabel
               onClick={(event) => event.stopPropagation()}
               onFocus={(event) => event.stopPropagation()}
@@ -65,14 +53,10 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
               label={topic.title}
             />
 
-            <Typography color="textSecondary">
-              {truncate(topic.terms.join(", "), 20)}
-            </Typography>
+            <Typography color="textSecondary">{truncate(topic.terms.join(", "), 20)}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography color="textSecondary">
-              {topic.terms.join(", ")}
-            </Typography>
+            <Typography color="textSecondary">{topic.terms.join(", ")}</Typography>
           </AccordionDetails>
         </Accordion>
       ))}
@@ -81,10 +65,3 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
 };
 
 export default TopicsList;
-
-/**
- * Make sure a string is maximum `n` characters long
- */
-const truncate = (str: string, n: number): string => {
-  return str.length > n ? str.substr(0, n - 1) + "..." : str;
-};
