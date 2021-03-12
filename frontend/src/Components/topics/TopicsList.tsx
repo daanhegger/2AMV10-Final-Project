@@ -34,12 +34,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface Topic {
-  title: string;
-  color: string;
-  terms: string[];
-}
-
 interface Props {
   topics: Topic[];
 }
