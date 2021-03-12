@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
+import Sidebar from "./Components/Sidebar";
 
 const drawerWidth = 400;
 
@@ -103,11 +104,7 @@ function App() {
         <Toolbar />
 
         {/* Content of the sidebar */}
-        <ul>
-          {new Array(100).fill(undefined).map((_, i) => (
-            <li key={i}>Topic item {i}</li>
-          ))}
-        </ul>
+        <Sidebar />
       </Drawer>
     </div>
   );
