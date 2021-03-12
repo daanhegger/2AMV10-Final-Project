@@ -121,7 +121,7 @@ const VolumePlot: React.FC = () => {
         <p>Searching for term groups:</p>
         <ul>
           {searchTerms.map((terms) => (
-            <li onClick={() => removeSearchTerms(terms)}>
+            <li key={terms.join(", ")} onClick={() => removeSearchTerms(terms)}>
               {terms.length > 0 ? terms.join(", ") : "Complete set (default)"}
             </li>
           ))}
