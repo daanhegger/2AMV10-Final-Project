@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import TopicsList from "./topics/TopicsList";
@@ -31,13 +31,7 @@ const Sidebar: React.FC = () => {
       {/* Defining the views, conditional rendering based on the currently active tab */}
       {/* 0: Topic view */}
       {value === 0 && (
-        <TopicsList
-          topics={new Array(10).fill(undefined).map((_, i) => ({
-            title: `Topic ${i}`,
-            color: "red",
-            terms: new Array(10).fill(undefined).map((_, i) => `term ${i}`),
-          }))}
-        />
+        <TopicsList />
       )}
 
       {/* 1: Tweet inpection view */}
