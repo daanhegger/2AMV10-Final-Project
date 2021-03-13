@@ -4,6 +4,7 @@ import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
 import SearchControls from "./SearchControls";
 import BinSizeSelector from "../BinSizeSelector";
+import 'chartjs-plugin-zoom';
 
 type Coord = { x: number | Date | string; y: number };
 
@@ -61,8 +62,9 @@ const VolumePlot: React.FC = () => {
           },
           time: {
             displayFormats: {
-              hour: "HH:MM",
+              hour: "HH:MM D MMM",
             },
+            stepSize: 4,
           },
         },
       ],
@@ -172,6 +174,15 @@ const VolumePlot: React.FC = () => {
                 },
               },
             ],
+          },
+          plugins: {
+            zoom: {
+              pan: {
+                enabled: true,
+                speed: 2,
+                mode: "x",
+              },
+            },
           },
         }}
         ref={reference}
