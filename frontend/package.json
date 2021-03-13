@@ -54,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@material-ui/pickers": "^3.3.10",
     "@types/chart.js": "^2.9.31",
     "prettier": "2.2.1"
   }
