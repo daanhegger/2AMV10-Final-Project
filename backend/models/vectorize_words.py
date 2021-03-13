@@ -51,7 +51,6 @@ def generate_fasttext(messages: list):
 
 
 def init_word2vec(df: pd.DataFrame):
-    preprocess(df)
     tokenizer = TweetTokenizer()
     messages = [tokenizer.tokenize(m) for m in df['message']]
 

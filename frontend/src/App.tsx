@@ -1,96 +1,111 @@
-import React from 'react';
-import {Card} from "@material-ui/core";
-import useAxios from "axios-hooks"
-import Chart from "./Components/makeChart";
-import Grid from '@material-ui/core/Grid';
-import {SelectWordsCard} from "./Components/selectWords";
-import {SetAlgoParamsCard} from "./Components/setAlgoParams";
+import React, { useState } from "react";
+import {
+  AppBar,
+  Container,
+  createStyles,
+  Drawer,
+  makeStyles,
+  Theme,
+} from "@material-ui/core";
+import MainTool from "./Components/MainTool";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import clsx from "clsx";
+import Sidebar from "./Components/Sidebar";
 
-//Dummie data for the line/scatter chart
-const labels = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-const dataDummies = [5, 9, 3, 5, 2, 3, 1];
+const drawerWidth = 400;
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex",
+    },
+    appBar: {
+      zIndex: theme.zIndex.drawer + 1,
+    },
+    drawer: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+    drawerPaper: {
+      width: drawerWidth,
+    },
+    content: {
+      flexGrow: 1,
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginRight: -drawerWidth,
+    },
+    contentShift: {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    },
+  })
+);
 
 function App() {
-    const algoChoices = ['k-NN', 'algo-2', 'alg-3']
-
-    const [{ data, loading, error }] = useAxios(
-        'http://localhost:5000/word2vec'
-    )
-
-  if (loading) return <p>Loading...</p>;
-  if (error || !data) return <p>Error!</p>;
-
-
-  // Dummie words. Need to be changed with the most frequent names/topics from the actual data.
-  const words = [
-    "word 1",
-    "word 2",
-    "word 3",
-    "word 4",
-    "word 5",
-    "word 6",
-    "word 7",
-    "word 8",
-    "word 9",
-    "word 10",
-  ];
-
-  const dataForScatter = data.map((row: any[]) => ({
-    x: parseFloat(row[0]),
-    y: parseFloat(row[1]),
-  }));
-
-  const dataWords = data.map((row: any[]) => row[2]);
+  const classes = useStyles();
+  const [sidebar, setSidebar] = useState<boolean>(true);
 
   return (
-      <div className="App" style={{marginTop: "4em"}}>
-        <Grid container spacing={2}>
-          <Grid item xs={9}>
-            <div>
-              <Card className="vectorized-words-charts">
-                <Grid container spacing={3}>
-                  <Grid item xs={6}>
+    <div className={classes.root}>
+      {/* Top bar with title of tool and button to expand/collapse sidebar */}
+      <AppBar position="fixed" className={classes.appBar}>
+        <Toolbar>
+          <Typography style={{ flexGrow: 1 }} variant="h6">
+            Tweet-Analyzer
+          </Typography>
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={() => setSidebar(!sidebar)}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-                    <Chart
-                        type={"line"}
-                        ctx={"lineChart"}
-                        labels={labels}
-                        chartData={dataDummies}
-                        backgroundColor={"#FF9191"}
-                        chartLabel={"occurance"}
-                    />
+      {/* Center part of the tool */}
+      <main
+        // Conditional classes to adapt to "opened" state of the sidebar
+        className={clsx(classes.content, {
+          [classes.contentShift]: sidebar,
+        })}
+      >
+        <Container>
+          {/* Empty toolbar to compensate the height of the appbar */}
+          <Toolbar />
 
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Chart
-                        labels={dataWords}
-                        type={"scatter"}
-                        ctx={"scatterChart"}
-                        chartData={dataForScatter}
-                        backgroundColor={"#AEBBFF"}
-                        chartLabel={"occurance"}
-                    />
+          <div style={{ padding: "20px 0" }}>
+            {/* Main content of the page: the visualizations */}
+            <MainTool />
+          </div>
+        </Container>
+      </main>
 
-                  </Grid>
-                </Grid>
-              </Card>
-            </div>
-          </Grid>
-          <Grid item xs={3}>
-            <div>
-                <SetAlgoParamsCard algoChoices={algoChoices}/>
-                <SelectWordsCard words={words}/>
-            </div>
-          </Grid>
-        </Grid>
+      {/* Collapsable sidebar */}
+      <Drawer
+        open={sidebar}
+        variant="persistent"
+        anchor="right"
+        className={classes.drawer}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        {/* Empty toolbar to compensate the height of the appbar */}
+        <Toolbar />
+
+        {/* Content of the sidebar */}
+        <Sidebar />
+      </Drawer>
     </div>
   );
 }
