@@ -3,12 +3,10 @@ import { Card } from "@material-ui/core";
 import Chart from "./makeChart";
 import Grid from "@material-ui/core/Grid";
 import { SelectWordsCard } from "./selectWords";
-import { SetAlgoParamsCard } from "./setAlgoParams";
 import VolumePlot from "./volume/VolumePlot";
 import useAxios from "axios-hooks";
 
 const MainTool: React.FC = () => {
-  const algoChoices = ["k-NN", "algo-2", "alg-3"];
 
   const [{ data, loading, error }] = useAxios("http://localhost:5000/word2vec");
 
@@ -46,7 +44,6 @@ const MainTool: React.FC = () => {
         </Grid>
         <Grid item xs={3}>
           <div>
-            <SetAlgoParamsCard algoChoices={algoChoices} />
             <SelectWordsCard
               words={new Array(10).map((_, i) => `word ${i + 1}`)}
             />
