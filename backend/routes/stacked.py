@@ -4,8 +4,6 @@ from flask_cors import CORS
 import pandas as pd
 from flask import request
 from preprocess import df
-from functools import reduce
-from operator import or_
 
 stacked_routes = Blueprint('stacked', __name__)
 
@@ -32,9 +30,9 @@ def stacked():
         if(len(json.loads(search_terms)) > 0):
             search_terms = json.loads(search_terms)
         else:
-            search_terms = ['fire', 'fire alarm', 'disaster'] # top 20 words
+            search_terms = ['fire', 'water', 'disaster'] # top 20 words
     else:
-        search_terms = ['fire', 'fire alarm', 'disaster']
+        search_terms = ['fire', 'water', 'disaster']
 
     # default values & validation
     if freq_type is None: freq_type = "H"
@@ -49,11 +47,12 @@ def stacked():
     for term in search_terms:
         df_count = df[df.message.str.contains(term)].groupby(pd.Grouper(key="time", freq=group_frequency))['time'].count().reset_index(name="count")
         grouped_data.append(pd.DataFrame.from_dict({term: pd.Series(df_count['count'].values), 'time': pd.Series(df_count['time'].values)}))
-    print(grouped_data)
-    data = pd.concat(grouped_data).fillna(0).groupby('time').sum()
 
-    data_perc = data.divide(data[search_terms].sum(axis=1), axis=0).fillna(0)
+    data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
 
 
-    return data_perc['fire'].to_json()
+    data_perc = data.divide(data.sum(axis=1), axis=0).fillna(0)
+    print(data_perc)
 
+
+    return data_perc.to_json()
