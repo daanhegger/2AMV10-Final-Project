@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { List, ListItem, ListItemSecondaryAction, TextField } from "@material-ui/core";
+import { CircularProgress, List, ListItem, ListItemSecondaryAction, TextField } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { TermSuggestion } from "../../models";
 import axios from "axios";
@@ -59,11 +59,24 @@ const FindTerms: React.FC<Props> = ({ addTerm, alreadyAddedTerms }) => {
         loading={loading || word2vecAxios.loading}
         freeSolo
         onChange={(e, newValue) => setQuery(newValue || "")}
-        renderInput={(params) => <TextField {...params} variant="standard" label="Start typing to find terms" />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Start typing to find terms"
+            // Show loading spinner during API request
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <React.Fragment>
+                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </React.Fragment>
+              ),
+            }}
+          />
+        )}
         disabled={loading}
       />
-
-      {loading && <p>Loading similar terms...</p>}
 
       {/* Suggestion list, ordered by score */}
       <div style={{ overflow: "scroll", flexGrow: 1, maxHeight: 400 }}>
