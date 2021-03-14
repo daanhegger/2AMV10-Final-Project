@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 // Import material font
@@ -11,7 +13,11 @@ ReactDOM.render(
   <React.StrictMode>
     {/* CssBaseline: Change default css properties to make page more material-like */}
     <CssBaseline />
-    <App />
+
+    {/* Providor for material ui date/time pickers */}
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <App />
+    </MuiPickersUtilsProvider>
   </React.StrictMode>,
 
   document.getElementById("root")

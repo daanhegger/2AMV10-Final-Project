@@ -1,8 +1,9 @@
-import { MenuItem, Select, TextField } from "@material-ui/core";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Line } from "react-chartjs-2";
+import DateFilter from "../DateFilter";
 import SearchControls from "./SearchControls";
+import BinSizeSelector from "../BinSizeSelector";
 
 type Coord = { x: number | Date | string; y: number };
 
@@ -19,14 +20,18 @@ const dataMapper = (data: Record<string, number>): Coord[] =>
  * Plot frequency of messages over time
  */
 const VolumePlot: React.FC = () => {
-  const [frequencyType, setFrequencyType] = useState<string>("min");
-  const [frequencyAmount, setFrequencyAmount] = useState<number>(60);
+  // Binsize settings
+  const defaultValues = { amount: 1, unit: "H" };
+  const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
+  const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
+
   // Each search actions is a list of words, multiple actions allowed so 2d array
   const [searchTerms, setSearchTerms] = useState<string[][]>([[]]);
   const [datasets, setDatasets] = useState<Chart.ChartDataSets[]>();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const reference: any = React.createRef();
 
   /**
    * Add a new set of search terms to the list
@@ -39,12 +44,32 @@ const VolumePlot: React.FC = () => {
    * Remove a set of search terms from the list
    */
   const removeSearchTerms = (terms: string[]) => {
-    setSearchTerms(
-      searchTerms.filter(
-        (currentTerms) => currentTerms.join("") !== terms.join("")
-      )
-    );
+    setSearchTerms(searchTerms.filter((currentTerms) => currentTerms.join("") !== terms.join("")));
   };
+
+  function updateConfigByMutating(chart: any, start?: string, end?: string) {
+    let lineChart = chart.current.chartInstance;
+
+    lineChart.config.options.scales = {
+      xAxes: [
+        {
+          type: "time",
+          position: "bottom",
+          ticks: {
+            min: start, //e.g. "2020-04-09 01:58:00"
+            max: end,
+          },
+          time: {
+            displayFormats: {
+              hour: "HH:MM",
+            },
+          },
+        },
+      ],
+    };
+
+    lineChart.update();
+  }
 
   /**
    * Every time parameters change, reload all datasets
@@ -66,9 +91,7 @@ const VolumePlot: React.FC = () => {
 
         setDatasets(
           responses.map((response, i) => ({
-            label: searchTerms.length
-              ? searchTerms[i].join(", ")
-              : "Complete set",
+            label: searchTerms.length ? searchTerms[i].join(", ") : "Complete set",
             data: dataMapper(response.data),
           }))
         );
@@ -89,49 +112,52 @@ const VolumePlot: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         {/* Text search bar */}
         <SearchControls onAdd={addSearchTerms}></SearchControls>
 
-        {/* Options for frequency */}
-        <div style={{ display: "flex", alignItems: "flex-end" }}>
-          <TextField
-            label="Frequency"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            value={frequencyAmount}
-            onChange={(e) => setFrequencyAmount(parseInt(e.target.value, 10))}
-          />
+        {/* Display all the search groups, click to delete */}
+        <div>
+          <p>Searching for term groups:</p>
+          <ul>
+            {searchTerms.map((terms) => (
+              <li key={terms.join(", ")} onClick={() => removeSearchTerms(terms)}>
+                {terms.length > 0 ? terms.join(", ") : "Complete set (default)"}
+              </li>
+            ))}
+          </ul>
+          <button onClick={() => addSearchTerms([])}>Add complete set</button>
 
-          <Select
-            value={frequencyType}
-            onChange={(e) => setFrequencyType(e.target.value as string)}
-          >
-            <MenuItem value="min">Minute(s)</MenuItem>
-            <MenuItem value="H">Hour(s)</MenuItem>
-            <MenuItem value="S">Second(s)</MenuItem>
-          </Select>
+          {/* Select the desired timespan of the volume graph */}
         </div>
-      </div>
 
-      {/* Display all the search groups, click to delete */}
-      <div>
-        <p>Searching for term groups:</p>
-        <ul>
-          {searchTerms.map((terms) => (
-            <li key={terms.join(", ")} onClick={() => removeSearchTerms(terms)}>
-              {terms.length > 0 ? terms.join(", ") : "Complete set (default)"}
-            </li>
-          ))}
-        </ul>
-        <button onClick={() => addSearchTerms([])}>Add complete set</button>
+        <div style={{ height: 20 }}></div>
+
+        {/* Plot settings */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {/* Filter date */}
+          <DateFilter
+            onChange={(start, end) => {
+              updateConfigByMutating(reference, start, end);
+            }}
+          ></DateFilter>
+
+          {/* Options for frequency */}
+          <BinSizeSelector
+            onChange={(amount, type) => {
+              setFrequencyType(type);
+              setFrequencyAmount(amount);
+            }}
+            defaultValues={defaultValues}
+          />
+        </div>
       </div>
 
       {/* React version of chart.js for easy plotting */}
       <Line
-        data={{ datasets }}
+        data={{
+          datasets: datasets ? datasets.map((d) => ({ ...d, backgroundColor: "rgb(65,83,175, 0.1)", borderColor: "rgb(65,83,175,0.6)" })) : [],
+        }}
         options={{
           scales: {
             xAxes: [
@@ -140,14 +166,16 @@ const VolumePlot: React.FC = () => {
                 position: "bottom",
                 time: {
                   displayFormats: {
-                    hour: "HH:MM",
+                    hour: "HH:MM D MMM",
                   },
+                  stepSize: 4,
                 },
               },
             ],
           },
         }}
-      ></Line>
+        ref={reference}
+      />
     </div>
   );
 };
