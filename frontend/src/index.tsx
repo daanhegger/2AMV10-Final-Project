@@ -4,6 +4,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
+import { SnackbarProvider } from "notistack";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 // Import material font
@@ -16,7 +17,10 @@ ReactDOM.render(
 
     {/* Providor for material ui date/time pickers */}
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <App />
+      {/* Provider for imperative API for material ui snackbar (notifications) */}
+      <SnackbarProvider maxSnack={3}>
+        <App />
+      </SnackbarProvider>
     </MuiPickersUtilsProvider>
   </React.StrictMode>,
 
