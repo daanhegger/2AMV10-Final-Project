@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Grid } from "@material-ui/core";
+import { Box, Button, Chip, Grid, Typography } from "@material-ui/core";
 import { useSnackbar } from "notistack";
 import React from "react";
 import { Topic } from "../../models";
@@ -79,6 +79,11 @@ const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete }) => {
             {topic.terms.map((term, i) => (
               <Chip key={topic.title + term + i.toString()} label={term} onDelete={() => handleDeleteTerm(term)} style={{ margin: "0 8px 8px 0" }} />
             ))}
+            {topic.terms.length === 0 && (
+              <Typography color="textSecondary">
+                No terms in this topic yet. Use the module on the right to search for and add new terms...
+              </Typography>
+            )}
           </div>
 
           {/* Button to delete topic */}
