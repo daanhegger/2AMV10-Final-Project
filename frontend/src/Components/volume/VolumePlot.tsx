@@ -47,8 +47,6 @@ const VolumePlot: React.FC = () => {
     setSearchTerms(searchTerms.filter((currentTerms) => currentTerms.join("") !== terms.join("")));
   };
 
-  console.log(searchTerms)
-
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
     let lineChart = chart.current.chartInstance;
 
@@ -105,7 +103,6 @@ const VolumePlot: React.FC = () => {
     };
     fetchData();
   }, [frequencyType, frequencyAmount, searchTerms]);
-    console.log(datasets)
   /**
    * Network handlers
    */

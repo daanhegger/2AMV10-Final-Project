@@ -31,7 +31,6 @@ const StakedPlot: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const reference: any = React.createRef();
-
   useEffect(() => {
     async function init() {
       window.addEventListener('storage', () => {
