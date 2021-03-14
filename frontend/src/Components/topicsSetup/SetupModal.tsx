@@ -1,22 +1,10 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  Button,
-  DialogActions,
-  Grid,
-  List,
-  ListItem,
-  DialogTitle,
-  ListItemText,
-  makeStyles,
-  Theme,
-  createStyles,
-  InputBase,
-} from "@material-ui/core";
+import { Dialog, Button, DialogActions, Grid, List, ListItem, DialogTitle, ListItemText, makeStyles, Theme, createStyles } from "@material-ui/core";
 import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
 import { useSnackbar } from "notistack";
 import EditTopic from "./EditTopic";
+import AddTopic from "./AddTopic";
 
 const defaultTopics: Topic[] = [
   { title: "Fire", color: "red", terms: ["fire", "smoke", "burn"] },
@@ -138,7 +126,7 @@ const SetupModal = () => {
             </div>
 
             {/* Simple form to add a new topic */}
-            <AddTopicInput onAdd={(title) => handleAddTopic(title)} />
+            <AddTopic onAdd={handleAddTopic} />
           </div>
         </Grid>
 
@@ -166,28 +154,3 @@ const SetupModal = () => {
 };
 
 export default SetupModal;
-
-interface AddTopicInputProps {
-  onAdd(title: string): void;
-}
-
-/**
- * Simple textinput to add a new topic to the list
- * Wrapped in a form -> press enter to submit
- */
-const AddTopicInput: React.FC<AddTopicInputProps> = ({ onAdd }) => {
-  const [text, setText] = useState("");
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setText("");
-        onAdd(text);
-      }}
-      style={{ padding: "10px 16px" }}
-    >
-      <InputBase fullWidth placeholder="Type a title and press enter..." value={text} onChange={(e) => setText(e.target.value)} />
-    </form>
-  );
-};
