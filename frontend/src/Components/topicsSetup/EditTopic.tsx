@@ -72,7 +72,7 @@ const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete }) => {
         <div style={{ borderRight: "1px solid #c7c7c7", height: "100%", padding: 10, display: "flex", flexDirection: "column" }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <h3>Topic: {topic.title}</h3>
-            <ColorPicker value={topic.color} onChange={(color) => handleChangeColor(color.css.backgroundColor)} hideTextfield disableAlpha />
+            <ColorPicker value={topic.color} onChange={(color) => handleChangeColor(color.css.backgroundColor)} hideTextfield disableAlpha deferred />
           </Box>
 
           <div style={{ flex: 1 }}>
