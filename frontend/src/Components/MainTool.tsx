@@ -6,6 +6,7 @@ import { SelectWordsCard } from "./selectWords";
 import { SetAlgoParamsCard } from "./setAlgoParams";
 import VolumePlot from "./volume/VolumePlot";
 import useAxios from "axios-hooks";
+import StackedPlot from "./stacked/stackedPlot";
 
 const MainTool: React.FC = () => {
   const algoChoices = ["k-NN", "algo-2", "alg-3"];
@@ -24,6 +25,7 @@ const MainTool: React.FC = () => {
   return (
     <>
       <VolumePlot></VolumePlot>
+      <StackedPlot />
 
       <Grid container spacing={2}>
         <Grid item xs={9}>

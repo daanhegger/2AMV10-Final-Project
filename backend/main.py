@@ -34,9 +34,11 @@ CORS(app)
 # Add routes from other files
 from routes.volume import volume_routes
 from routes.tweets import tweets_routes
+from routes.stacked import stacked_routes
 
 app.register_blueprint(volume_routes)
 app.register_blueprint(tweets_routes)
+app.register_blueprint(stacked_routes)
 
 
 @app.route('/')

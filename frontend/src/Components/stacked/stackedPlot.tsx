@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, {useEffect, useState} from "react";
 import { Line } from "react-chartjs-2";
+import axios from "axios";
 import DateFilter from "../DateFilter";
-import SearchControls from "./SearchControls";
 import BinSizeSelector from "../BinSizeSelector";
 
 type Coord = { x: number | Date | string; y: number };
@@ -19,8 +18,8 @@ const dataMapper = (data: Record<string, number>): Coord[] =>
 /**
  * Plot frequency of messages over time
  */
-const VolumePlot: React.FC = () => {
-  // Binsize settings
+const StakedPlot: React.FC = () => {
+   // Binsize settings
   const defaultValues = { amount: 1, unit: "H" };
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
@@ -33,21 +32,13 @@ const VolumePlot: React.FC = () => {
   const [error, setError] = useState(false);
   const reference: any = React.createRef();
 
-  /**
-   * Add a new set of search terms to the list
-   */
-  const addSearchTerms = (terms: string[]) => {
-    setSearchTerms([...searchTerms, terms]);
-  };
+  useEffect(() => {
+    async function init() {
+      window.addEventListener('storage', () => {
+        setSearchTerms(JSON.parse(localStorage.getItem('topicsList')||'[]'));
+      })};
+    init();}, [])
 
-  /**
-   * Remove a set of search terms from the list
-   */
-  const removeSearchTerms = (terms: string[]) => {
-    setSearchTerms(searchTerms.filter((currentTerms) => currentTerms.join("") !== terms.join("")));
-  };
-
-  console.log(searchTerms)
 
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
     let lineChart = chart.current.chartInstance;
@@ -81,7 +72,7 @@ const VolumePlot: React.FC = () => {
       try {
         const responses = await Promise.all(
           searchTerms.map((termGroup) =>
-            axios.get("http://localhost:5000/volume", {
+            axios.get("http://localhost:5000/stacked", {
               params: {
                 freq_type: frequencyType,
                 freq_amount: frequencyAmount,
@@ -105,7 +96,7 @@ const VolumePlot: React.FC = () => {
     };
     fetchData();
   }, [frequencyType, frequencyAmount, searchTerms]);
-    console.log(datasets)
+
   /**
    * Network handlers
    */
@@ -115,26 +106,6 @@ const VolumePlot: React.FC = () => {
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        {/* Text search bar */}
-        <SearchControls onAdd={addSearchTerms}></SearchControls>
-
-        {/* Display all the search groups, click to delete */}
-        <div>
-          <p>Searching for term groups:</p>
-          <ul>
-            {searchTerms.map((terms) => (
-              <li key={terms.join(", ")} onClick={() => removeSearchTerms(terms)}>
-                {terms.length > 0 ? terms.join(", ") : "Complete set (default)"}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => addSearchTerms([])}>Add complete set</button>
-
-          {/* Select the desired timespan of the volume graph */}
-        </div>
-
-        <div style={{ height: 20 }}></div>
-
         {/* Plot settings */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {/* Filter date */}
@@ -155,7 +126,7 @@ const VolumePlot: React.FC = () => {
         </div>
       </div>
 
-      {/* React version of chart.js for easy plotting */}
+      {/* React version of chart.j for easy plotting */}
       <Line
         data={{
           datasets: datasets ? datasets.map((d) => ({ ...d, backgroundColor: "rgb(65,83,175, 0.1)", borderColor: "rgb(65,83,175,0.6)" })) : [],
@@ -174,6 +145,9 @@ const VolumePlot: React.FC = () => {
                 },
               },
             ],
+            yAxes: [{
+                stacked: true
+            }]
           },
         }}
         ref={reference}
@@ -182,4 +156,4 @@ const VolumePlot: React.FC = () => {
   );
 };
 
-export default VolumePlot;
+export default StakedPlot;
