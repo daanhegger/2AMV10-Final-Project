@@ -1,16 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, Button, DialogActions, Grid, List, ListItem, DialogTitle, ListItemText, makeStyles, Theme, createStyles } from "@material-ui/core";
 import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
-import { useSnackbar } from "notistack";
 import EditTopic from "./EditTopic";
 import AddTopic from "./AddTopic";
-
-const defaultTopics: Topic[] = [
-  { title: "Fire", color: "red", terms: ["fire", "smoke", "burn"] },
-  { title: "Flood", color: "blue", terms: ["water", "leak", "water"] },
-  { title: "Injury", color: "yellow", terms: ["hospital", "ambulance", "pain"] },
-];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,23 +14,29 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+interface Props {
+  onCloseDialog(): void;
+  dialogOpened: boolean;
+  onSave(topics: Topic[]): void;
+  globalTopics: Topic[];
+}
+
 /**
  * Setup wizard to allow user to manage the topics
  */
-const SetupModal = () => {
+const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics, onSave }) => {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
-  const [open, setOpen] = useState(true);
-  const [topics, setTopics] = useState<Topic[]>(defaultTopics);
+  const [topics, setTopics] = useState<Topic[]>(globalTopics);
 
   // Active topic to edit, only save title since topic itself can change
   // Requirement: title should be unique
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const activeTopicObject = topics.find((t) => t.title === activeTopic);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // When the topics change outside of this component, update them in here too
+  useEffect(() => {
+    setTopics(globalTopics);
+  }, [globalTopics]);
 
   /**
    * When a single topic is changed (by for example the EditTopic componenent)
@@ -76,17 +75,15 @@ const SetupModal = () => {
   };
 
   /**
-   * When the user hits "Save", put all topics in localStorage as backup,
-   * close the window and show a success notification
+   * When the user hits "Save", handled by parent container
    */
   const handleSave = () => {
-    window.localStorage.setItem("topics", JSON.stringify(topics));
-    handleClose();
-    enqueueSnackbar("Successfully saved your topics", { variant: "success" });
+    onSave(topics);
+    onCloseDialog();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg" disableBackdropClick classes={{ paper: classes.dialog }}>
+    <Dialog open={dialogOpened} onClose={onCloseDialog} fullWidth maxWidth="lg" disableBackdropClick classes={{ paper: classes.dialog }}>
       {/* Top part: title */}
       <DialogTitle style={{ borderBottom: "1px solid #c7c7c7" }}>Set-up your topics for investigation</DialogTitle>
 

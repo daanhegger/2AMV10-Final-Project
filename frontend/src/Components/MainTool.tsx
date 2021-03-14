@@ -1,12 +1,12 @@
 import React from "react";
+import SetupModalContainer from "./topicsSetup/SetupModalContainer";
 import VolumePlot from "./volume/VolumePlot";
-import SetupModal from "./topicsSetup/SetupModal";
 
 const MainTool: React.FC = () => {
   return (
     <>
       <VolumePlot></VolumePlot>
-      <SetupModal />
+      <SetupModalContainer />
     </>
   );
 };

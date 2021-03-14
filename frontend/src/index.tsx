@@ -9,6 +9,7 @@ import { SnackbarProvider } from "notistack";
 import CssBaseline from "@material-ui/core/CssBaseline";
 // Import material font
 import "fontsource-roboto";
+import { AppProvider } from "./context/topicsContext";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,7 +20,9 @@ ReactDOM.render(
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       {/* Provider for imperative API for material ui snackbar (notifications) */}
       <SnackbarProvider maxSnack={3}>
-        <App />
+        <AppProvider>
+          <App />
+        </AppProvider>
       </SnackbarProvider>
     </MuiPickersUtilsProvider>
   </React.StrictMode>,
