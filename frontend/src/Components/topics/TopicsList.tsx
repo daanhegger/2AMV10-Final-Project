@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -6,7 +6,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { createStyles, FormControlLabel, makeStyles, Theme } from "@material-ui/core";
-import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,19 +30,32 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface Props {
-  topics: Topic[];
-}
-
 /**
  * Summarized list of topics
  */
-const TopicsList: React.FC<Props> = ({ topics }) => {
+const TopicsList = () => {
   const classes = useStyles();
+
+  const [localStorageTopics, getLocalStorageList] = useState(JSON.parse(localStorage.getItem('topicsList')||'[]'))
+
+  const topics = useMemo(() => {
+    return localStorageTopics.map((topic: string) => ({
+      title: `${topic}`,
+      color: "red",
+      terms: localStorageTopics.map((topic: string) => `${topic}`),
+    }));
+    },[localStorageTopics])
+
+  useEffect(() => {
+    async function init() {
+      window.addEventListener('storage', () => {
+        getLocalStorageList(JSON.parse(localStorage.getItem('topicsList')||'[]'));
+      })};
+    init();}, [])
 
   return (
     <>
-      {topics.map((topic) => (
+      {topics.map((topic: { title: string; terms: string[]; }) => (
         <Accordion key={topic.title} square elevation={0} className={classes.accordion}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} classes={{ content: classes.accordionSummary }}>
             <FormControlLabel
