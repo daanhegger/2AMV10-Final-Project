@@ -13,19 +13,12 @@ interface AppContextProps {
 // Create an initial context
 export const AppContext = createContext<AppContextProps>({} as AppContextProps);
 
-// Default topics for easy debugging
-const defaultTopics: Topic[] = [
-  { title: "Fire", color: "red", terms: ["fire", "smoke", "burn"] },
-  { title: "Flood", color: "blue", terms: ["water", "leak", "water"] },
-  { title: "Injury", color: "yellow", terms: ["hospital", "ambulance", "pain"] },
-];
-
 /**
  * Implementation of the context
  * Default values and state storage
  */
 export const AppProvider: React.FC = ({ children }) => {
-  const [topics, setTopics] = useState<Topic[]>(defaultTopics);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [topicManagerOpened, setTopicManagerOpened] = useState<boolean>(false);
 
   // Restore topics from localstorage if present
