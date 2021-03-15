@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask import request
 from sklearn.decomposition import PCA
 import spacy
+from sklearn.manifold import TSNE
 
 print("Downloading spacy language model")
 nlp = spacy.load('en_core_web_lg')
@@ -39,8 +40,11 @@ def volume():
     vectors = np.array([nlp.vocab.vectors[w] for w in keys[0]])
 
     # Dimensionality reduction
-    pca = PCA(n_components=2)
-    vectors_2d = pca.fit_transform(vectors)
+    # pca = PCA(n_components=2)
+    # vectors_2d = pca.fit_transform(vectors)
+
+    tsne = TSNE(n_components=2)
+    vectors_2d = tsne.fit_transform(vectors)
 
     # Convert data to easy format
     data = [
