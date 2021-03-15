@@ -85,7 +85,7 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
   return (
     <Dialog open={dialogOpened} onClose={onCloseDialog} fullWidth maxWidth="lg" disableBackdropClick classes={{ paper: classes.dialog }}>
       {/* Top part: title */}
-      <DialogTitle style={{ borderBottom: "1px solid #c7c7c7" }}>Set-up your topics for investigation</DialogTitle>
+      <DialogTitle style={{ borderBottom: "1px solid #c7c7c7" }}>Topic manager: choose relevant terms for further investigation</DialogTitle>
 
       {/* Middle part: main content of the dialog */}
       <Grid container direction="row" justify="flex-start" alignItems="stretch" style={{ flexGrow: 1, flexShrink: 1 }}>

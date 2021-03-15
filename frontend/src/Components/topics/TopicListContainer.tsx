@@ -11,9 +11,12 @@ const TopicListContainer: React.FC = () => {
       {/* Topic list itself */}
       <TopicsList topics={topics} />
 
+      {/* If no topics created yet */}
+      {topics.length === 0 && <p style={{ textAlign: "center" }}>No topics yet, use the topic manager to create</p>}
+
       {/* Button to open topic-manager */}
       <Box display="flex" justifyContent="center" mt={2}>
-        <Button onClick={() => setTopicManagerOpened(true)}>Open manager</Button>
+        <Button onClick={() => setTopicManagerOpened(true)}>Open topic manager</Button>
       </Box>
     </div>
   );
