@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
+import {Line} from "react-chartjs-2";
+// import { Violine } from "chartjs-chart-box-and-violin-plot";
 
 /**
  * Map Flask object response to coordinate-array
@@ -77,16 +79,14 @@ const StakedPlot: React.FC = () => {
             })
           )
         );
+        
+        var data: Chart.ChartDataSets[] = []
 
-        console.log(responses)
+        responses.map(response => {
+          ["Fire & Smoke", "Water & Flood"].forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
+        })
 
-        // responses.map((response, i) => (
-        //     response.data.map((row:any) => dataMapper(row)
-
-        setDatasets(["Fire & Smoke", "Water & Flood"].map(term => ({
-                data:dataMapper(responses[0].data, term),
-                label: term
-             })));
+        setDatasets(data)
 
       } catch (e) {
         setError(true);
@@ -129,7 +129,7 @@ const StakedPlot: React.FC = () => {
       </div>
 
       {/* React version of chart.j for easy plotting */}
-      <Violin
+      <Line
         data={{
           datasets: datasets,
         }}
