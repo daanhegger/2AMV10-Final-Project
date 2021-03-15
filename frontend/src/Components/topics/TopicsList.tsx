@@ -6,8 +6,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { createStyles, FormControlLabel, makeStyles, Theme } from "@material-ui/core";
-import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
+import { Topic } from "../../models";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,7 +43,7 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
 
   return (
     <>
-      {topics.map((topic) => (
+      {topics.map((topic: { title: string; terms: string[] }) => (
         <Accordion key={topic.title} square elevation={0} className={classes.accordion}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} classes={{ content: classes.accordionSummary }}>
             <FormControlLabel

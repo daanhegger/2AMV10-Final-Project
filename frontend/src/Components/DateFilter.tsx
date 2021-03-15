@@ -83,7 +83,9 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         <InputLabel>Start</InputLabel>
         <Select value={filterStartDate} onChange={handleStartDateChange} label="Start">
           {dates.map((date) => (
-            <MenuItem value={date}>{moment(date).format("MMMM Do")}</MenuItem>
+            <MenuItem key={date} value={date}>
+              {moment(date).format("MMMM Do")}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -105,7 +107,9 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         <InputLabel>End</InputLabel>
         <Select value={filterEndDate} onChange={handleEndDateChange} label="End">
           {dates.map((date) => (
-            <MenuItem value={date}>{moment(date).format("MMMM Do")}</MenuItem>
+            <MenuItem key={date} value={date}>
+              {moment(date).format("MMMM Do")}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
