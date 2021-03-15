@@ -4,6 +4,7 @@ import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 import "chartjs-plugin-zoom";
+import { Box } from "@material-ui/core";
 
 type Coord = { x: number | Date | string; y: number };
 
@@ -112,6 +113,8 @@ const VolumePlot: React.FC = () => {
           />
         </div>
       </div>
+
+      <Box mt={3} />
 
       {/* React version of chart.js for easy plotting */}
       <Line
