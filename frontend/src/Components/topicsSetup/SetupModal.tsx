@@ -142,6 +142,9 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
 
       {/* Bottom part: save the topics */}
       <DialogActions style={{ borderTop: "1px solid #c7c7c7" }}>
+        <Button variant="text" onClick={() => onCloseDialog()}>
+          Cancel
+        </Button>
         <Button variant="contained" color="primary" onClick={handleSave}>
           Save &amp; close
         </Button>
