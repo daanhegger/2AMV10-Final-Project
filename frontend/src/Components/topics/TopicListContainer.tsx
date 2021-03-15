@@ -8,7 +8,10 @@ const TopicListContainer: React.FC = () => {
 
   return (
     <div>
+      {/* Topic list itself */}
       <TopicsList topics={topics} />
+
+      {/* Button to open topic-manager */}
       <Box display="flex" justifyContent="center" mt={2}>
         <Button onClick={() => setTopicManagerOpened(true)}>Open manager</Button>
       </Box>
