@@ -1,9 +1,11 @@
-import json
 from flask import Blueprint, abort
 from flask_cors import CORS
 import pandas as pd
 from flask import request
 from preprocess import df
+import json
+from functools import reduce
+from operator import or_
 
 stacked_routes = Blueprint('stacked', __name__)
 
@@ -15,8 +17,6 @@ def stacked():
     # frequency type: possible values --> https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
     freq_type = request.args.get('freq_type')
 
-    print(request.args.get('search_terms'))
-
     # frequency amount: positive integer
     try:
         freq_amount = int(request.args.get('freq_amount'))  # non-negative integer
@@ -25,14 +25,13 @@ def stacked():
         return
 
     # search terms: list of strings
-    search_terms = request.args.get('search_terms')
-    if search_terms is not None:
-        if(len(json.loads(search_terms)) > 0):
-            search_terms = json.loads(search_terms)
-        else:
-            search_terms = ['fire', 'water', 'disaster'] # top 20 words
-    else:
-        search_terms = ['fire', 'water', 'disaster']
+    topics_string = request.args.get('topics')
+    topics = []
+
+    if topics_string is not None:
+        topics_json = json.loads(topics_string)
+        if len(topics_json) > 0:
+            topics = topics_json
 
     # default values & validation
     if freq_type is None: freq_type = "H"
@@ -42,17 +41,36 @@ def stacked():
 
     group_frequency = str(freq_amount) + str(freq_type)
 
-
+    # df_count for every topic
     grouped_data = []
-    for term in search_terms:
-        df_count = df[df.message.str.contains(term)].groupby(pd.Grouper(key="time", freq=group_frequency))['time'].count().reset_index(name="count")
-        grouped_data.append(pd.DataFrame.from_dict({term: pd.Series(df_count['count'].values), 'time': pd.Series(df_count['time'].values)}))
 
+    for topic in topics:
+        # Add "or" filter condition for every term in the topic
+        # tweet should be including if any of the terms are in the tweet
+        conditions = reduce(or_, [df.message.str.contains(term) for term in topic["terms"]])
+
+        # Only tweets in the topic
+        relavant_tweets = df[conditions]
+
+        # Count number of tweets per bin
+        df_count = relavant_tweets.groupby(pd.Grouper(key="time", freq=group_frequency))['time'].count().reset_index(name="count")
+
+        # Add current topic tweets to list
+        grouped_data.append(
+            pd.DataFrame.from_dict({
+                topic["title"]: pd.Series(df_count['count'].values),
+                'time': pd.Series(df_count['time'].values)
+            })
+        )
+
+    # Concat all topics
     data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
 
-
+    # Compute relative percentages
     data_perc = data.divide(data.sum(axis=1), axis=0).fillna(0)
-    print(data_perc)
 
+    # Add index to other column to make sure it returns in json
+    data_perc['time'] = data_perc.index
 
-    return data_perc.to_json()
+    # Convert to json for http response
+    return data_perc.to_json(orient='records')
