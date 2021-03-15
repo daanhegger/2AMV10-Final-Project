@@ -1,19 +1,16 @@
 import React, {useEffect, useState} from "react";
-import { Line } from "react-chartjs-2";
 import axios from "axios";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 
-type Coord = { x: number | Date | string; y: number };
-
 /**
  * Map Flask object response to coordinate-array
  */
-const dataMapper = (data: Record<string, number>): Coord[] =>
-  Object.keys(data).map((key, i) => ({
-    x: new Date(parseInt(key)),
-    y: data[key],
-  }));
+const dataMapper = (data: any, term: any) =>
+    data.map((data_row: any) => ({
+        x: new Date(parseInt(data_row.time)),
+        y: data_row[term],
+    }));
 
 /**
  * Plot frequency of messages over time
@@ -75,18 +72,22 @@ const StakedPlot: React.FC = () => {
               params: {
                 freq_type: frequencyType,
                 freq_amount: frequencyAmount,
-                search_terms: JSON.stringify(termGroup),
+                topics: JSON.stringify(termGroup),
               },
             })
           )
         );
 
-        setDatasets(
-          responses.map((response, i) => ({
-            label: searchTerms.length ? searchTerms[i].join(", ") : "Complete set",
-            data: dataMapper(response.data),
-          }))
-        );
+        console.log(responses)
+
+        // responses.map((response, i) => (
+        //     response.data.map((row:any) => dataMapper(row)
+
+        setDatasets(["Fire & Smoke", "Water & Flood"].map(term => ({
+                data:dataMapper(responses[0].data, term),
+                label: term
+             })));
+
       } catch (e) {
         setError(true);
       } finally {
@@ -101,6 +102,8 @@ const StakedPlot: React.FC = () => {
    */
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
+
+  console.log(datasets)
 
   return (
     <div>
@@ -126,9 +129,9 @@ const StakedPlot: React.FC = () => {
       </div>
 
       {/* React version of chart.j for easy plotting */}
-      <Line
+      <Violin
         data={{
-          datasets: datasets ? datasets.map((d) => ({ ...d, backgroundColor: "rgb(65,83,175, 0.1)", borderColor: "rgb(65,83,175,0.6)" })) : [],
+          datasets: datasets,
         }}
         options={{
           scales: {

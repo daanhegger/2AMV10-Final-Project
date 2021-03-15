@@ -26,7 +26,10 @@ def stacked():
 
     # search terms: list of strings
     topics_string = request.args.get('topics')
-    topics = []
+    topics = [
+        {"title": "Fire & Smoke", "terms": ["fire", "smoke", "burn"]},
+        {"title": "Water & Flood", "terms": ["water", "flood", "leak", "contaminated"]},
+    ]
 
     if topics_string is not None:
         topics_json = json.loads(topics_string)
@@ -64,13 +67,18 @@ def stacked():
         )
 
     # Concat all topics
-    data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
+    if len(grouped_data):
+        data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
 
-    # Compute relative percentages
-    data_perc = data.divide(data.sum(axis=1), axis=0).fillna(0)
+        # Compute relative percentages
+        data_perc = data.divide(data.sum(axis=1), axis=0).fillna(0)
 
-    # Add index to other column to make sure it returns in json
-    data_perc['time'] = data_perc.index
+        # Add index to other column to make sure it returns in json
+        data_perc['time'] = data_perc.index
+        print(data_perc)
+        return data_perc.to_json(orient='records')
 
+    else:
+        return {'error': 'No search terms'}
     # Convert to json for http response
-    return data_perc.to_json(orient='records')
+
