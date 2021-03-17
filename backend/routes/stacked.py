@@ -26,6 +26,7 @@ def stacked():
 
     # search terms: list of strings
     topics_string = request.args.get('topics')
+    # for test purpose
     topics = [
         {"title": "Fire & Smoke", "terms": ["fire", "smoke", "burn"]},
         {"title": "Water & Flood", "terms": ["water", "flood", "leak", "contaminated"]},

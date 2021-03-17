@@ -2,17 +2,39 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
-import {Line} from "react-chartjs-2";
-// import { Violine } from "chartjs-chart-box-and-violin-plot";
+import Plot from 'react-plotly.js';
 
 /**
  * Map Flask object response to coordinate-array
  */
-const dataMapper = (data: any, term: any) =>
+type Coord = { x: number | Date | string; y: number };
+
+const dataMapper = (data: any, term: any): Coord[] =>
     data.map((data_row: any) => ({
         x: new Date(parseInt(data_row.time)),
         y: data_row[term],
     }));
+
+const transformDataset = (datasets: any[]) => {
+  const data: { name: any; x: any[]; y: any[]; stackgroup: string, groupnorm: string  }[] = []
+  datasets.forEach(dataset => {
+    const x: any[] = [];
+    const y: any[] = [];
+    const label = dataset.label
+    dataset.data.forEach( (tuple: any) => {
+      x.push(tuple.x);
+      y.push(tuple.y);
+    })
+    data.push({
+      name: label,
+      x: x,
+      y: y,
+      stackgroup: 'one',
+      groupnorm:'percent'
+    })
+  })
+  return data
+}
 
 /**
  * Plot frequency of messages over time
@@ -25,7 +47,7 @@ const StakedPlot: React.FC = () => {
 
   // Each search actions is a list of words, multiple actions allowed so 2d array
   const [searchTerms, setSearchTerms] = useState<string[][]>([[]]);
-  const [datasets, setDatasets] = useState<Chart.ChartDataSets[]>();
+  const [datasets, setDatasets] = useState<any []>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -80,13 +102,20 @@ const StakedPlot: React.FC = () => {
           )
         );
         
-        var data: Chart.ChartDataSets[] = []
+        var data: any[] = []
+        console.log(searchTerms[0].length)
+        if(searchTerms[0].length > 0){
+            responses.map(response => {
+              searchTerms.forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
+            })
+        }
 
+        // for test purpose
         responses.map(response => {
-          ["Fire & Smoke", "Water & Flood"].forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
+                      ["Fire & Smoke", "Water & Flood"].forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
         })
 
-        setDatasets(data)
+        setDatasets(transformDataset(data))
 
       } catch (e) {
         setError(true);
@@ -102,8 +131,6 @@ const StakedPlot: React.FC = () => {
    */
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
-
-  console.log(datasets)
 
   return (
     <div>
@@ -129,32 +156,12 @@ const StakedPlot: React.FC = () => {
       </div>
 
       {/* React version of chart.j for easy plotting */}
-      <Line
-        data={{
-          datasets: datasets,
-        }}
-        options={{
-          scales: {
-            xAxes: [
-              {
-                type: "time",
-                position: "bottom",
-                time: {
-                  displayFormats: {
-                    hour: "HH:MM D MMM",
-                  },
-                  stepSize: 4,
-                },
-              },
-            ],
-            yAxes: [{
-                stacked: true
-            }]
-          },
-        }}
-        ref={reference}
+      <Plot
+        data={datasets}
+        layout={ {width: 1230, height: 700 } }
       />
     </div>
+
   );
 };
 
