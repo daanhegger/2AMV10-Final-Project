@@ -71,13 +71,9 @@ def stacked():
     if len(grouped_data):
         data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
 
-        # Compute relative percentages
-        data_perc = data.divide(data.sum(axis=1), axis=0).fillna(0)
+        data['time'] = data.index
 
-        # Add index to other column to make sure it returns in json
-        data_perc['time'] = data_perc.index
-        print(data_perc)
-        return data_perc.to_json(orient='records')
+        return data.to_json(orient='records')
 
     else:
         return {'error': 'No search terms'}
