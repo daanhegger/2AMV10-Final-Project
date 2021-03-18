@@ -6,6 +6,13 @@ import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const dates: string[] = ["2020-04-06", "2020-04-07", "2020-04-08", "2020-04-09", "2020-04-10"];
 
+const defaultView = {
+  startDate: "2020-04-06",
+  endDate: "2020-04-10",
+  startTime: "00:00:00",
+  endTime: "23:59:59",
+};
+
 interface Props {
   onChange(start?: string, end?: string): void;
 }
@@ -15,12 +22,12 @@ interface Props {
  */
 const DateFilter: React.FC<Props> = ({ onChange }) => {
   // Filter start/end date
-  const [filterStartDate, setFilterStartDate] = useState<string | null>("2020-04-06");
-  const [filterEndDate, setFilterEndDate] = useState<string | null>("2020-04-10");
+  const [filterStartDate, setFilterStartDate] = useState<string | null>(defaultView.startDate);
+  const [filterEndDate, setFilterEndDate] = useState<string | null>(defaultView.endDate);
 
   // Filter start/end time
-  const [filterStartTime, setFilterStartTime] = useState<string | null>("00:00:00");
-  const [filterEndTime, setFilterEndTime] = useState<string | null>("23:59:59");
+  const [filterStartTime, setFilterStartTime] = useState<string | null>(defaultView.startTime);
+  const [filterEndTime, setFilterEndTime] = useState<string | null>(defaultView.endTime);
 
   const handleStartDateChange = (
     e: React.ChangeEvent<{
@@ -46,6 +53,20 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
     } else if (type === "end") {
       setFilterEndTime(value + ":00");
     }
+  };
+
+  /**
+   * Reset the date filter to its default values
+   */
+  const handleResetView = () => {
+    // Change the state to default
+    setFilterStartDate(defaultView.startDate);
+    setFilterEndDate(defaultView.endDate);
+    setFilterStartTime(defaultView.startTime);
+    setFilterEndTime(defaultView.endTime);
+
+    // Send changes to parent
+    onChange(defaultView.startDate + " " + defaultView.startTime, defaultView.endDate + " " + defaultView.endTime);
   };
 
   /**
@@ -83,7 +104,9 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         <InputLabel>Start</InputLabel>
         <Select value={filterStartDate} onChange={handleStartDateChange} label="Start">
           {dates.map((date) => (
-            <MenuItem value={date}>{moment(date).format("MMMM Do")}</MenuItem>
+            <MenuItem key={date} value={date}>
+              {moment(date).format("MMMM Do")}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -105,7 +128,9 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         <InputLabel>End</InputLabel>
         <Select value={filterEndDate} onChange={handleEndDateChange} label="End">
           {dates.map((date) => (
-            <MenuItem value={date}>{moment(date).format("MMMM Do")}</MenuItem>
+            <MenuItem key={date} value={date}>
+              {moment(date).format("MMMM Do")}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -125,6 +150,12 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
 
       <Button variant="contained" disabled={!validateDates()} type="submit">
         Apply
+      </Button>
+
+      <div style={{ width: 10 }}></div>
+
+      <Button variant="contained" onClick={handleResetView}>
+        Reset
       </Button>
     </form>
   );

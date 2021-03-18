@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
-import SearchControls from "./SearchControls";
 import BinSizeSelector from "../BinSizeSelector";
+import "chartjs-plugin-zoom";
+import { Box } from "@material-ui/core";
 
 type Coord = { x: number | Date | string; y: number };
 
@@ -25,27 +26,11 @@ const VolumePlot: React.FC = () => {
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
 
-  // Each search actions is a list of words, multiple actions allowed so 2d array
-  const [searchTerms, setSearchTerms] = useState<string[][]>([[]]);
   const [datasets, setDatasets] = useState<Chart.ChartDataSets[]>();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const reference: any = React.createRef();
-
-  /**
-   * Add a new set of search terms to the list
-   */
-  const addSearchTerms = (terms: string[]) => {
-    setSearchTerms([...searchTerms, terms]);
-  };
-
-  /**
-   * Remove a set of search terms from the list
-   */
-  const removeSearchTerms = (terms: string[]) => {
-    setSearchTerms(searchTerms.filter((currentTerms) => currentTerms.join("") !== terms.join("")));
-  };
 
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
     let lineChart = chart.current.chartInstance;
@@ -61,8 +46,9 @@ const VolumePlot: React.FC = () => {
           },
           time: {
             displayFormats: {
-              hour: "HH:MM",
+              hour: "HH:MM D MMM",
             },
+            stepSize: 4,
           },
         },
       ],
@@ -77,24 +63,19 @@ const VolumePlot: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const responses = await Promise.all(
-          searchTerms.map((termGroup) =>
-            axios.get("http://localhost:5000/volume", {
-              params: {
-                freq_type: frequencyType,
-                freq_amount: frequencyAmount,
-                search_terms: JSON.stringify(termGroup),
-              },
-            })
-          )
-        );
+        const response = await axios.get("http://localhost:5000/volume", {
+          params: {
+            freq_type: frequencyType,
+            freq_amount: frequencyAmount,
+          },
+        });
 
-        setDatasets(
-          responses.map((response, i) => ({
-            label: searchTerms.length ? searchTerms[i].join(", ") : "Complete set",
+        setDatasets([
+          {
+            label: "All tweets",
             data: dataMapper(response.data),
-          }))
-        );
+          },
+        ]);
       } catch (e) {
         setError(true);
       } finally {
@@ -102,7 +83,8 @@ const VolumePlot: React.FC = () => {
       }
     };
     fetchData();
-  }, [frequencyType, frequencyAmount, searchTerms]);
+  }, [frequencyType, frequencyAmount]);
+
   /**
    * Network handlers
    */
@@ -112,26 +94,6 @@ const VolumePlot: React.FC = () => {
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        {/* Text search bar */}
-        <SearchControls onAdd={addSearchTerms}></SearchControls>
-
-        {/* Display all the search groups, click to delete */}
-        <div>
-          <p>Searching for term groups:</p>
-          <ul>
-            {searchTerms.map((terms) => (
-              <li key={terms.join(", ")} onClick={() => removeSearchTerms(terms)}>
-                {terms.length > 0 ? terms.join(", ") : "Complete set (default)"}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => addSearchTerms([])}>Add complete set</button>
-
-          {/* Select the desired timespan of the volume graph */}
-        </div>
-
-        <div style={{ height: 20 }}></div>
-
         {/* Plot settings */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {/* Filter date */}
@@ -152,6 +114,8 @@ const VolumePlot: React.FC = () => {
         </div>
       </div>
 
+      <Box mt={3} />
+
       {/* React version of chart.js for easy plotting */}
       <Line
         data={{
@@ -171,6 +135,15 @@ const VolumePlot: React.FC = () => {
                 },
               },
             ],
+          },
+          plugins: {
+            zoom: {
+              pan: {
+                enabled: true,
+                speed: 2,
+                mode: "x",
+              },
+            },
           },
         }}
         ref={reference}

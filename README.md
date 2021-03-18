@@ -2,9 +2,8 @@
 
 ## Backend
 
-When added dependency: `conda env export > backend/environment.yml`
-
-Updating local env: `conda env update --file backend/environment.yml  --prune`
+Install spacy english language model:
+`python -m spacy download en_core_web_lg`
 
 Starting the server:
 `FLASK_APP=main.py flask run`

@@ -10,3 +10,9 @@ export interface Topic {
   color: string;
   terms: string[];
 }
+
+export interface TermSuggestion {
+  term: string;
+  score: number;
+  vector: { x: number; y: number };
+}

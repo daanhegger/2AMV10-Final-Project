@@ -35,11 +35,14 @@ CORS(app)
 from routes.volume import volume_routes
 from routes.tweets import tweets_routes
 from routes.stacked import stacked_routes
+from routes.similar_words import similar_words_routes
 
 app.register_blueprint(volume_routes)
 app.register_blueprint(tweets_routes)
+app.register_blueprint(similar_words_routes)
 app.register_blueprint(stacked_routes)
 
+print("Application started!")
 
 @app.route('/')
 def hello_world():
@@ -51,4 +54,3 @@ def word2vec():
     return jsonify(
         [(str(x), str(y), w) for x, y, w in get_word2vec_vectors()]
     )
-

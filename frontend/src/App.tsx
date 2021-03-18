@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  AppBar,
-  Container,
-  createStyles,
-  Drawer,
-  makeStyles,
-  Theme,
-} from "@material-ui/core";
+import { AppBar, Container, createStyles, Drawer, makeStyles, Theme } from "@material-ui/core";
 import MainTool from "./Components/MainTool";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -60,13 +53,9 @@ function App() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography style={{ flexGrow: 1 }} variant="h6">
-            Tweet-Analyzer
+            Y*int Analyzer
           </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={() => setSidebar(!sidebar)}
-          >
+          <IconButton edge="end" color="inherit" onClick={() => setSidebar(!sidebar)}>
             <MenuIcon />
           </IconButton>
         </Toolbar>
@@ -83,7 +72,7 @@ function App() {
           {/* Empty toolbar to compensate the height of the appbar */}
           <Toolbar />
 
-          <div style={{ padding: "20px 0" }}>
+          <div style={{ padding: "30px 0" }}>
             {/* Main content of the page: the visualizations */}
             <MainTool />
           </div>
