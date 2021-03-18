@@ -16,7 +16,7 @@ const dataMapper = (data: any, term: any): Coord[] =>
     }));
 
 const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; stackgroup: string, groupnorm: string  }[] = []
+  const data: { name: any; x: any[]; y: any[]; stackgroup: string, groupnorm: string, hoverinfo: any  }[] = []
   datasets.forEach(dataset => {
     const x: any[] = [];
     const y: any[] = [];
@@ -30,7 +30,8 @@ const transformDataset = (datasets: any[]) => {
       x: x,
       y: y,
       stackgroup: 'one',
-      groupnorm:'percent'
+      groupnorm:'percent',
+      hoverinfo: y
     })
   })
   return data
@@ -103,7 +104,7 @@ const StakedPlot: React.FC = () => {
         );
         
         var data: any[] = []
-        console.log(searchTerms[0].length)
+
         if(searchTerms[0].length > 0){
             responses.map(response => {
               searchTerms.forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
@@ -131,6 +132,7 @@ const StakedPlot: React.FC = () => {
    */
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
+
 
   return (
     <div>
