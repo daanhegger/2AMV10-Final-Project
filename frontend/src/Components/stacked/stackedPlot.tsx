@@ -1,22 +1,24 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 import Plot from 'react-plotly.js';
+import {AppContext} from "../../context/topicsContext";
 
 /**
  * Map Flask object response to coordinate-array
  */
-type Coord = { x: number | Date | string; y: number };
+type Coord = { x: number | Date | string; y: number};
 
 const dataMapper = (data: any, term: any): Coord[] =>
     data.map((data_row: any) => ({
+
         x: new Date(parseInt(data_row.time)),
-        y: data_row[term],
+        y: data_row[term.title],
     }));
 
 const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; stackgroup: string, groupnorm: string, hoverinfo: any  }[] = []
+  const data: { name: any; x: any[]; y: any[]; stackgroup: string; groupnorm: string }[] = []
   datasets.forEach(dataset => {
     const x: any[] = [];
     const y: any[] = [];
@@ -30,8 +32,7 @@ const transformDataset = (datasets: any[]) => {
       x: x,
       y: y,
       stackgroup: 'one',
-      groupnorm:'percent',
-      hoverinfo: y
+      groupnorm:'percent'
     })
   })
   return data
@@ -42,23 +43,17 @@ const transformDataset = (datasets: any[]) => {
  */
 const StakedPlot: React.FC = () => {
    // Binsize settings
+  const { topics } = useContext(AppContext);
   const defaultValues = { amount: 1, unit: "H" };
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
 
   // Each search actions is a list of words, multiple actions allowed so 2d array
-  const [searchTerms, setSearchTerms] = useState<string[][]>([[]]);
   const [datasets, setDatasets] = useState<any []>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const reference: any = React.createRef();
-  useEffect(() => {
-    async function init() {
-      window.addEventListener('storage', () => {
-        setSearchTerms(JSON.parse(localStorage.getItem('topicsList')||'[]'));
-      })};
-    init();}, [])
 
 
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
@@ -92,12 +87,12 @@ const StakedPlot: React.FC = () => {
     const fetchData = async () => {
       try {
         const responses = await Promise.all(
-          searchTerms.map((termGroup) =>
+          topics.map((topic) =>
             axios.get("http://localhost:5000/stacked", {
               params: {
                 freq_type: frequencyType,
                 freq_amount: frequencyAmount,
-                topics: JSON.stringify(termGroup),
+                topics: JSON.stringify(topic),
               },
             })
           )
@@ -105,16 +100,15 @@ const StakedPlot: React.FC = () => {
         
         var data: any[] = []
 
-        if(searchTerms[0].length > 0){
+        if(topics){
             responses.map(response => {
-              searchTerms.forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
+              topics.forEach(topic => {
+                if (data.filter(data => data.label == topic.title).length === 0 && response.data[0][topic.title]){
+                  data.push({label: topic.title, data: dataMapper(response.data, topic), color: topic.color})
+                }
+              })
             })
         }
-
-        // for test purpose
-        responses.map(response => {
-                      ["Fire & Smoke", "Water & Flood"].forEach(term => data.push({label: term, data: dataMapper(response.data, term)}))
-        })
 
         setDatasets(transformDataset(data))
 
@@ -125,14 +119,13 @@ const StakedPlot: React.FC = () => {
       }
     };
     fetchData();
-  }, [frequencyType, frequencyAmount, searchTerms]);
+  }, [frequencyType, frequencyAmount, topics]);
 
   /**
    * Network handlers
    */
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
-
 
   return (
     <div>
