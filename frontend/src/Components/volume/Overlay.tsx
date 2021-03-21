@@ -15,8 +15,9 @@ const Overlay: React.FC<Props> = ({ chart, onInterval }) => {
     var canvas = chart.canvas as any;
     var overlay = document.getElementById("volume-plot-overlay") as any;
     var startIndex = 0;
-    overlay.width = canvas.width;
-    overlay.height = canvas.height;
+    const linePlot = canvas.getBoundingClientRect();
+    overlay.width = linePlot.width;
+    overlay.height = linePlot.height;
     var selectionContext = overlay?.getContext("2d");
     var selectionRect = {
       w: 0,
