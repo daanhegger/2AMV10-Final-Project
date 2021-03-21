@@ -13,6 +13,8 @@ from collections import Counter
 nltk.download('stopwords')
 stopwords_en = stopwords.words('english')
 
+with open("./popular_tokens.txt") as p_file:
+    popular_tokens = [w.strip() for w in p_file.readlines()]
 
 word_frequency_routes = Blueprint('word_frequency', __name__)
 
@@ -24,7 +26,7 @@ def filter_token(token):
     Return true if token is allowed, false otherwise
     """
     # Should not be a stopword
-    if token in stopwords_en:
+    if token in stopwords_en or token in popular_tokens:
         return False
 
     # At least one real letter
