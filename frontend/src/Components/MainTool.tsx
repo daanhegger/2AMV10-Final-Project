@@ -7,7 +7,7 @@ import StackedPlot from "./stacked/stackedPlot";
 const MainTool: React.FC = () => {
   return (
     <>
-      <VolumePlot></VolumePlot>
+      <VolumePlot />
       <StackedPlot />
       <SetupModalContainer />
     </>
