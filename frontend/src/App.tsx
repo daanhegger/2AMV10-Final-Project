@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function App() {
   const classes = useStyles();
-  const [sidebar, setSidebar] = useState<boolean>(true);
+  const [sidebar, setSidebar] = useState<boolean>(process.env.REACT_APP_DRAWER !== undefined ? process.env.REACT_APP_DRAWER === "true" : true);
 
   return (
     <div className={classes.root}>
