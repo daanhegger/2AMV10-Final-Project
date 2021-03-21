@@ -4,10 +4,11 @@ import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 import "chartjs-plugin-zoom";
-import { Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import Overlay from "./Overlay";
 import WordCloud from "./WordCloud";
 import moment from "moment";
+import CloseIcon from "@material-ui/icons/Close";
 
 type Coord = { x: Date; y: number };
 
@@ -194,7 +195,23 @@ const VolumePlot: React.FC = () => {
 
       {interval && (
         <p>
-          Selection made between {moment(interval.start).format("HH:MM D MMM")} and {moment(interval.end).format("HH:MM D MMM")}
+          Selection made between
+          <i style={{ textDecoration: "underline" }}>{moment(interval.start).format("HH:MM D MMM")}</i> and{" "}
+          <i>{moment(interval.end).format("HH:MM D MMM")}</i>
+          <Button
+            size="small"
+            variant="text"
+            endIcon={
+              <CloseIcon
+                fontSize="small"
+                onClick={() => {
+                  setInterval(null);
+                }}
+              />
+            }
+          >
+            Clear selection
+          </Button>
         </p>
       )}
 
