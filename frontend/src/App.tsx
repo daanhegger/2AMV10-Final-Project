@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AppBar, Container, createStyles, Drawer, makeStyles, Theme } from "@material-ui/core";
+import {AppBar, Box, Container, createStyles, Drawer, makeStyles, Tab, Tabs, Theme} from "@material-ui/core";
 import MainTool from "./Components/MainTool";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -43,9 +43,38 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+function TabPanel(props: any) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 function App() {
   const classes = useStyles();
   const [sidebar, setSidebar] = useState<boolean>(true);
+  const [value, setValue] = useState(0);
+
 
   return (
     <div className={classes.root}>
@@ -55,11 +84,17 @@ function App() {
           <Typography style={{ flexGrow: 1 }} variant="h6">
             Y*int Analyzer
           </Typography>
+          <Tabs value={value} onChange={(_, newValue) => (setValue(newValue))} aria-label="simple tabs example">
+            <Tab label="Home" {...a11yProps(0)} />
+            <Tab label="Explore" {...a11yProps(1)} />
+          </Tabs>
           <IconButton edge="end" color="inherit" onClick={() => setSidebar(!sidebar)}>
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
+      <TabPanel value={value} index={0}/>
+      <TabPanel value={value} index={1}/>
 
       {/* Center part of the tool */}
       <main
@@ -74,7 +109,7 @@ function App() {
 
           <div style={{ padding: "30px 0" }}>
             {/* Main content of the page: the visualizations */}
-            <MainTool />
+            <MainTool window={value} />
           </div>
         </Container>
       </main>
