@@ -10,14 +10,19 @@ const MainTool: (props: Props) => (JSX.Element | null) = (props: Props) => {
   const { window } = props;
   if (window == 0){ //home screen
     return (
-    <>
-      <VolumePlot />
-      <SetupModalContainer />
-    </>
-  );
+      <>
+        <VolumePlot />
+        <SetupModalContainer />
+      </>
+    );
   }
   if (window == 1){ //stacked plot screen
-    return (<StackedPlot />)
+    return (
+      <>
+        <StackedPlot />
+        <SetupModalContainer />
+      </>
+    )
   }
 
   return null;

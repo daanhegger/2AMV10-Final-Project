@@ -18,7 +18,7 @@ const dataMapper = (data: any, term: any): Coord[] =>
     }));
 
 const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; stackgroup: string; groupnorm: string }[] = []
+  const data: { name: any; x: any[]; y: any[]; stackgroup: string; groupnorm: string; }[] = []
   datasets.forEach(dataset => {
     const x: any[] = [];
     const y: any[] = [];
@@ -32,7 +32,7 @@ const transformDataset = (datasets: any[]) => {
       x: x,
       y: y,
       stackgroup: 'one',
-      groupnorm:'percent'
+      groupnorm:'percent',
     })
   })
   return data
