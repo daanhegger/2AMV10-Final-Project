@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useMemo, useState} from "react";
 import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
+import {Input, Select, MenuItem, FormControl, InputLabel} from "@material-ui/core";
 
 /**
  * Map Flask object response to coordinate-array
@@ -36,6 +37,28 @@ const transformDataset = (datasets: any[]) => {
   return data
 }
 
+const locationList = [
+  'No location',
+  'Broadview',
+  'Chapparal',
+  'Cheddarford',
+  'Downtown',
+  'East Parton',
+  'Easton',
+  'Northwest',
+  'Oak Willow',
+  'Old Town',
+  'Palace Hills',
+  'Pepper Mill',
+  'Safe Town',
+  'Scenic Vista',
+  'Southton',
+  'Southwest',
+  'Terrapin Springs',
+  'West Parton',
+  'Weston'
+]
+
 /**
  * Plot frequency of messages over time
  */
@@ -46,6 +69,16 @@ const StakedPlot: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  const [location, selectLocation] = useState('all')
+    const handleChange = (event: any) => {
+    selectLocation(event.target.value);
+  };
+
+ //  '<Location with-held due to contract>' 'Broadview' 'Chapparal'
+ // 'Cheddarford' 'Downtown' 'East Parton' 'Easton' 'Northwest' 'Oak Willow'
+ // 'Old Town' 'Palace Hills' 'Pepper Mill' 'Safe Town' 'Scenic Vista'
+ // 'Southton' 'Southwest' 'Terrapin Springs' 'West Parton' 'Weston'
 
 
   /**
@@ -58,6 +91,7 @@ const StakedPlot: React.FC = () => {
           topics.map((topic) =>
             axios.get("http://localhost:5000/stacked", {
               params: {
+                location: location,
                 freq_type: defaultValues.unit,
                 freq_amount: defaultValues.amount,
                 topics: JSON.stringify(topic),
@@ -97,6 +131,26 @@ const StakedPlot: React.FC = () => {
 
   return (
     <div>
+      {/*<FormControl>*/}
+      {/*  <InputLabel id="demo-mutiple-name-label">Name</InputLabel>*/}
+      {/* <Select*/}
+      {/*    labelId="demo-mutiple-name-label"*/}
+      {/*    id="demo-mutiple-name"*/}
+      {/*    multiple*/}
+      {/*    value={location}*/}
+      {/*    onChange={handleChange}*/}
+      {/*    input={<Input />}*/}
+      {/*  >*/}
+      {/*    {locationList.map((name) => (*/}
+      {/*      <MenuItem*/}
+      {/*        key={name}*/}
+      {/*        value={name}*/}
+      {/*      >*/}
+      {/*        {name}*/}
+      {/*      </MenuItem>*/}
+      {/*    ))}*/}
+      {/*  </Select>*/}
+      {/*</FormControl>*/}
 
       {/* React version of chart.j for easy plotting */}
       <Plot

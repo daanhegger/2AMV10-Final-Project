@@ -51,7 +51,8 @@ def stacked():
     relavant_tweets = df[conditions]
 
     # Count number of tweets per bin
-    df_count = relavant_tweets.groupby(pd.Grouper(key="time", freq=group_frequency))['time'].count().reset_index(name="count")
+    df_count = relavant_tweets.groupby(['location', pd.Grouper(key="time", freq=group_frequency)])['time'].count().reset_index(name="count")
+    print(df_count.location.unique())
 
     # Add current topic tweets to list
     grouped_data.append(
