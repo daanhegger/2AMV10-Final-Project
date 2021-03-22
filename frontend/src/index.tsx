@@ -11,6 +11,10 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import "fontsource-roboto";
 import { AppProvider } from "./context/topicsContext";
 
+// https://react-wordcloud.netlify.app/readme
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/scale.css";
+
 ReactDOM.render(
   <React.StrictMode>
     {/* CssBaseline: Change default css properties to make page more material-like */}

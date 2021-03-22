@@ -5,6 +5,10 @@ import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 import "chartjs-plugin-zoom";
 import { Box } from "@material-ui/core";
+import Overlay from "./Overlay";
+import { ChartPoint } from "chart.js";
+import WordCloud from "./WordCloud";
+import moment from "moment";
 
 type Coord = { x: number | Date | string; y: number };
 
@@ -30,12 +34,16 @@ const VolumePlot: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const reference: any = React.createRef();
+
+  const [interval, setInterval] = useState<{ start?: string; end?: string } | null>(null);
+
+  // Referece to chartjs instance
+  const [reference, setReference] = useState<any>(null);
 
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
-    let lineChart = chart.current.chartInstance;
+    let lineChart = chart.chartInstance;
 
-    lineChart.config.options.scales = {
+    const change = {
       xAxes: [
         {
           type: "time",
@@ -54,6 +62,7 @@ const VolumePlot: React.FC = () => {
       ],
     };
 
+    lineChart.config.options.scales = change;
     lineChart.update();
   }
 
@@ -116,6 +125,24 @@ const VolumePlot: React.FC = () => {
 
       <Box mt={3} />
 
+      {reference && reference.chartInstance.canvas && (
+        <Overlay
+          chart={reference.chartInstance}
+          onInterval={(start, end) => {
+            if (datasets) {
+              const ds = datasets[0].data as ChartPoint[];
+              if (ds) {
+                const startDate = ds[start].x;
+                const endDate = ds[end]?.x;
+                if (startDate && endDate) {
+                  setInterval({ start: moment(startDate).format("YYYY-MM-DD HH:mm:ss"), end: moment(endDate).format("YYYY-MM-DD HH:mm:ss") });
+                }
+              }
+            }
+          }}
+        />
+      )}
+
       {/* React version of chart.js for easy plotting */}
       <Line
         data={{
@@ -136,18 +163,11 @@ const VolumePlot: React.FC = () => {
               },
             ],
           },
-          plugins: {
-            zoom: {
-              pan: {
-                enabled: true,
-                speed: 2,
-                mode: "x",
-              },
-            },
-          },
         }}
-        ref={reference}
+        ref={(reference) => setReference(reference)}
       />
+
+      {interval && interval.start && interval.end && <WordCloud start={interval.start} end={interval.end} />}
     </div>
   );
 };
