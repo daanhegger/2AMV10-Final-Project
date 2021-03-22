@@ -24,6 +24,11 @@ def stacked():
         abort(400, 'Invalid frequency amount')
         return
 
+    location = request.args.get('location')
+
+    if location == 'Undefined':
+        location = '<Location with-held due to contract>'
+
     # search terms: list of strings
     topics_string = request.args.get('topics')
     # for test purpose
@@ -37,8 +42,6 @@ def stacked():
     # default values & validation
     if freq_type is None: freq_type = "H"
     if freq_amount is None: freq_amount = 1
-    if freq_type not in ["H", "min", "S"] or freq_amount < 0:
-        abort(400, 'Invalid frequency')
 
     group_frequency = str(freq_amount) + str(freq_type)
 
@@ -50,21 +53,23 @@ def stacked():
     # Only tweets in the topic
     relavant_tweets = df[conditions]
 
+    if location != '':
+        relavant_tweets = relavant_tweets[ df.location == location]
+
     # Count number of tweets per bin
     df_count = relavant_tweets.groupby(['location', pd.Grouper(key="time", freq=group_frequency)])['time'].count().reset_index(name="count")
-    print(df_count.location.unique())
 
     # Add current topic tweets to list
     grouped_data.append(
         pd.DataFrame.from_dict({
             topics["title"]: pd.Series(df_count['count'].values),
-            'time': pd.Series(df_count['time'].values)
+            'time': pd.Series(df_count['time'].values),
         })
     )
 
     # Concat all topics
     if len(grouped_data):
-        data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time")).sum()
+        data = pd.concat(grouped_data).fillna(0).groupby(pd.Grouper(key="time", freq=group_frequency)).sum()
 
         data['time'] = data.index
         return data.to_json(orient='records')

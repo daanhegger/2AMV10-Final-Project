@@ -2,7 +2,8 @@ import React, {useContext, useEffect, useMemo, useState} from "react";
 import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
-import {Input, Select, MenuItem, FormControl, InputLabel} from "@material-ui/core";
+import {TextField} from "@material-ui/core";
+import {Autocomplete} from "@material-ui/lab";
 
 /**
  * Map Flask object response to coordinate-array
@@ -38,7 +39,6 @@ const transformDataset = (datasets: any[]) => {
 }
 
 const locationList = [
-  'No location',
   'Broadview',
   'Chapparal',
   'Cheddarford',
@@ -56,7 +56,8 @@ const locationList = [
   'Southwest',
   'Terrapin Springs',
   'West Parton',
-  'Weston'
+  'Weston',
+  'Undefined'
 ]
 
 /**
@@ -70,16 +71,7 @@ const StakedPlot: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [location, selectLocation] = useState('all')
-    const handleChange = (event: any) => {
-    selectLocation(event.target.value);
-  };
-
- //  '<Location with-held due to contract>' 'Broadview' 'Chapparal'
- // 'Cheddarford' 'Downtown' 'East Parton' 'Easton' 'Northwest' 'Oak Willow'
- // 'Old Town' 'Palace Hills' 'Pepper Mill' 'Safe Town' 'Scenic Vista'
- // 'Southton' 'Southwest' 'Terrapin Springs' 'West Parton' 'Weston'
-
+  const [location, selectLocation] = useState('')
 
   /**
    * Every time parameters change, reload all datasets
@@ -105,6 +97,7 @@ const StakedPlot: React.FC = () => {
         if(topics){
             responses.map(response => (
               topics.forEach(topic => {
+                console.log(response)
                 if (data.filter(data => data.label === topic.title).length === 0 && response.data[0][topic.title]){
                   data.push({label: topic.title, data: dataMapper(response.data, topic), color: topic.color})
                 }
@@ -121,7 +114,7 @@ const StakedPlot: React.FC = () => {
       }
     };
     fetchData();
-  }, [topics, defaultValues]);
+  }, [topics, defaultValues, location]);
 
   /**
    * Network handlers
@@ -131,28 +124,13 @@ const StakedPlot: React.FC = () => {
 
   return (
     <div>
-      {/*<FormControl>*/}
-      {/*  <InputLabel id="demo-mutiple-name-label">Name</InputLabel>*/}
-      {/* <Select*/}
-      {/*    labelId="demo-mutiple-name-label"*/}
-      {/*    id="demo-mutiple-name"*/}
-      {/*    multiple*/}
-      {/*    value={location}*/}
-      {/*    onChange={handleChange}*/}
-      {/*    input={<Input />}*/}
-      {/*  >*/}
-      {/*    {locationList.map((name) => (*/}
-      {/*      <MenuItem*/}
-      {/*        key={name}*/}
-      {/*        value={name}*/}
-      {/*      >*/}
-      {/*        {name}*/}
-      {/*      </MenuItem>*/}
-      {/*    ))}*/}
-      {/*  </Select>*/}
-      {/*</FormControl>*/}
+      <Autocomplete
+          value={location}
+          onChange={(_, newValue) => (selectLocation(newValue || ''))}
+          options={locationList}
+          renderInput={(params) => <TextField {...params} label="Filter on location" variant="outlined" />}
+      />
 
-      {/* React version of chart.j for easy plotting */}
       <Plot
         data={datasets}
         layout={ {width: 1230, height: 700 } }
