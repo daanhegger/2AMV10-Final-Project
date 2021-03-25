@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AppBar, Container, createStyles, Drawer, makeStyles, Theme } from "@material-ui/core";
+import { AppBar, Container, createStyles, Drawer, makeStyles, Tab, Tabs, Theme } from "@material-ui/core";
 import MainTool from "./Components/MainTool";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -43,9 +43,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
 function App() {
   const classes = useStyles();
+
   const [sidebar, setSidebar] = useState<boolean>(process.env.REACT_APP_DRAWER !== undefined ? process.env.REACT_APP_DRAWER === "true" : true);
+  const [value, setValue] = useState(0);
 
   return (
     <div className={classes.root}>
@@ -55,6 +64,10 @@ function App() {
           <Typography style={{ flexGrow: 1 }} variant="h6">
             Y*int Analyzer
           </Typography>
+          <Tabs value={value} onChange={(_, newValue) => setValue(newValue)} aria-label="simple tabs example">
+            <Tab label="Home" {...a11yProps(0)} />
+            <Tab label="Explore" {...a11yProps(1)} />
+          </Tabs>
           <IconButton edge="end" color="inherit" onClick={() => setSidebar(!sidebar)}>
             <MenuIcon />
           </IconButton>
@@ -74,7 +87,7 @@ function App() {
 
           <div style={{ padding: "30px 0" }}>
             {/* Main content of the page: the visualizations */}
-            <MainTool />
+            <MainTool window={value} />
           </div>
         </Container>
       </main>
