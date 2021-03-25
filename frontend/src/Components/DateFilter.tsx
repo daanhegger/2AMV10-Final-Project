@@ -7,7 +7,7 @@ import ScheduleIcon from "@material-ui/icons/Schedule";
 
 const dates: string[] = ["2020-04-06", "2020-04-07", "2020-04-08", "2020-04-09", "2020-04-10"];
 
-const defaultView = {
+export const defaultView = {
   startDate: "2020-04-06",
   endDate: "2020-04-10",
   startTime: "00:00:00",
