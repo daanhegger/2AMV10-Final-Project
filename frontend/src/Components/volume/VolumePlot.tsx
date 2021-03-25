@@ -153,7 +153,7 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
       {/* Helper text and buttons to manage drag selection */}
       {interval && (
-        <Box display="flex" justifyContent="space-between" my={2}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
           <p>
             Showing most frequent words from {moment(interval.start).format("HH:MM D MMM")} to {moment(interval.end).format("HH:MM D MMM")}
           </p>
