@@ -201,14 +201,10 @@ const VolumePlot: React.FC = () => {
           <Button
             size="small"
             variant="text"
-            endIcon={
-              <CloseIcon
-                fontSize="small"
-                onClick={() => {
-                  setInterval(null);
-                }}
-              />
-            }
+            onClick={() => {
+              setInterval(null);
+            }}
+            endIcon={<CloseIcon fontSize="small" />}
           >
             Clear selection
           </Button>
