@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
 import Sidebar from "./Components/Sidebar";
+import SetupModalContainer from "./Components/topicsSetup/SetupModalContainer";
 
 const drawerWidth = 400;
 
@@ -108,6 +109,8 @@ function App() {
         {/* Content of the sidebar */}
         <Sidebar />
       </Drawer>
+
+      <SetupModalContainer />
     </div>
   );
 }
