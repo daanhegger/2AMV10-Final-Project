@@ -5,9 +5,10 @@ import { GeoPermissibleObjects } from "d3";
 
 interface Props {
   size?: number;
+  baseColor: string;
 }
 
-const HeatMapCity: React.FC<Props> = ({ size = 600 }) => {
+const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor }) => {
   const svgId = randomId();
   const selector = "svg#" + svgId;
 
@@ -84,12 +85,12 @@ const HeatMapCity: React.FC<Props> = ({ size = 600 }) => {
     setTimeout(() => {
       d3.select(selector)
         .selectAll(".nhpath")
-        .style("fill", "#7591ff")
+        .style("fill", baseColor)
         .style("stroke-width", "0.7")
         .style("stroke", "black")
         .style("fill-opacity", () => Math.random() / 2 + 0.5);
     }, 100);
-  }, [selector, size]);
+  }, [selector, size, baseColor]);
 
   return (
     <svg id={svgId} width="400px" height="400px">
