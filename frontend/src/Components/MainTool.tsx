@@ -1,34 +1,37 @@
 import React from "react";
-import SetupModalContainer from "./topicsSetup/SetupModalContainer";
 import VolumePlot from "./volume/VolumePlot";
 import StackedPlot from "./stacked/stackedPlot";
 import HeatMapCity from "./heatmap/HeatMapCity";
+import { Grid } from "@material-ui/core";
 
-interface Props {
-  window: number;
-}
-const MainTool: (props: Props) => JSX.Element | null = (props: Props) => {
-  const { window } = props;
-  if (window === 0) {
-    //home screen
-    return <VolumePlot />;
-  }
-  if (window === 1) {
-    //stacked plot screen
-    return (
-      <>
-        <StackedPlot />
-        <div>
-          <HeatMapCity baseColor="#7591ff" />
-          <HeatMapCity baseColor="red" />
-          <HeatMapCity baseColor="green" />
-          <HeatMapCity baseColor="yellow" />
-        </div>
-      </>
-    );
-  }
+const MainTool: React.FC = () => {
+  return (
+    <div>
+      {/* Volume plot for exploration */}
+      <VolumePlot />
 
-  return null;
+      {/* Stacked plot for investigation into topics */}
+      <StackedPlot />
+
+      {/* Temporary: grid of heatmaps */}
+      <div>
+        <Grid container>
+          <Grid item md={6}>
+            <HeatMapCity baseColor="#7591ff" />
+          </Grid>
+          <Grid item md={6}>
+            <HeatMapCity baseColor="red" />
+          </Grid>
+          <Grid item md={6}>
+            <HeatMapCity baseColor="green" />
+          </Grid>
+          <Grid item md={6}>
+            <HeatMapCity baseColor="yellow" />
+          </Grid>
+        </Grid>
+      </div>
+    </div>
+  );
 };
 
 export default MainTool;
