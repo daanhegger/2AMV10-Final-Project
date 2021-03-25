@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
 import BinSizeSelector from "../BinSizeSelector";
 import "chartjs-plugin-zoom";
-import { Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import Overlay from "./Overlay";
-import { ChartPoint } from "chart.js";
 import WordCloud from "./WordCloud";
 import moment from "moment";
+import CloseIcon from "@material-ui/icons/Close";
 
-type Coord = { x: number | Date | string; y: number };
+type Coord = { x: Date; y: number };
 
 /**
  * Map Flask object response to coordinate-array
  */
 const dataMapper = (data: Record<string, number>): Coord[] =>
-  Object.keys(data).map((key, i) => ({
+  Object.keys(data).map<Coord>((key, i) => ({
     x: new Date(parseInt(key)),
     y: data[key],
+    fillColor: "#FF0000",
   }));
 
 /**
@@ -30,15 +31,39 @@ const VolumePlot: React.FC = () => {
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
 
-  const [datasets, setDatasets] = useState<Chart.ChartDataSets[]>();
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [interval, setInterval] = useState<{ start?: string; end?: string } | null>(null);
+  const [points, setPoints] = useState<Coord[]>([]);
+  const [interval, setInterval] = useState<{ start: string; end: string } | null>(null);
 
   // Referece to chartjs instance
   const [reference, setReference] = useState<any>(null);
+
+  // useCallback such that the function is not re-generated after each re-render
+  // this way the overlay is only re-triggered when needed
+  const onInterval = useCallback(
+    (start, end) => {
+      if (points.length > 0) {
+        // Make sure the start date is the earliest date (most left point)
+        const startDate = points[start <= end ? start : end].x;
+        const endDate = points[end >= start ? end : start].x;
+
+        // Don't allow selection if the window size is 0
+        // (both dates are equal)
+        // When this happens: clear selection
+        if (startDate === endDate) {
+          setInterval(null);
+          return;
+        }
+
+        if (startDate && endDate) {
+          setInterval({ start: moment(startDate).format("YYYY-MM-DD HH:mm:ss"), end: moment(endDate).format("YYYY-MM-DD HH:mm:ss") });
+        }
+      }
+    },
+    [points]
+  );
 
   function updateConfigByMutating(chart: any, start?: string, end?: string) {
     let lineChart = chart.chartInstance;
@@ -79,12 +104,7 @@ const VolumePlot: React.FC = () => {
           },
         });
 
-        setDatasets([
-          {
-            label: "All tweets",
-            data: dataMapper(response.data),
-          },
-        ]);
+        setPoints(dataMapper(response.data));
       } catch (e) {
         setError(true);
       } finally {
@@ -125,49 +145,73 @@ const VolumePlot: React.FC = () => {
 
       <Box mt={3} />
 
-      {reference && reference.chartInstance.canvas && (
-        <Overlay
-          chart={reference.chartInstance}
-          onInterval={(start, end) => {
-            if (datasets) {
-              const ds = datasets[0].data as ChartPoint[];
-              if (ds) {
-                const startDate = ds[start].x;
-                const endDate = ds[end]?.x;
-                if (startDate && endDate) {
-                  setInterval({ start: moment(startDate).format("YYYY-MM-DD HH:mm:ss"), end: moment(endDate).format("YYYY-MM-DD HH:mm:ss") });
-                }
-              }
-            }
-          }}
-        />
-      )}
+      <div>
+        {/* Overlay for drag-selection */}
+        {reference && reference.chartInstance.canvas && <Overlay chart={reference.chartInstance} onInterval={onInterval} />}
 
-      {/* React version of chart.js for easy plotting */}
-      <Line
-        data={{
-          datasets: datasets ? datasets.map((d) => ({ ...d, backgroundColor: "rgb(65,83,175, 0.1)", borderColor: "rgb(65,83,175,0.6)" })) : [],
-        }}
-        options={{
-          scales: {
-            xAxes: [
+        {/* React version of chart.js for easy plotting */}
+        <Line
+          data={{
+            datasets: [
               {
-                type: "time",
-                position: "bottom",
-                time: {
-                  displayFormats: {
-                    hour: "HH:MM D MMM",
-                  },
-                  stepSize: 4,
+                label: "All tweets",
+                data: points,
+                backgroundColor: "rgb(65,83,175, 0.1)",
+                borderColor: "rgb(65,83,175,0.6)",
+                /**
+                 * Color the points yellow if they are in the selection
+                 */
+                pointBackgroundColor: (ctx) => {
+                  if (interval && ctx.dataIndex !== undefined) {
+                    const p = points[ctx.dataIndex];
+                    if (moment(p.x).format("YYYY-MM-DD HH:mm:ss") >= interval.start && moment(p.x).format("YYYY-MM-DD HH:mm:ss") <= interval.end) {
+                      return "#FF0000";
+                    }
+                  }
+                  return "rgb(65,83,175, 0.1)";
                 },
               },
             ],
-          },
-        }}
-        ref={(reference) => setReference(reference)}
-      />
+          }}
+          options={{
+            scales: {
+              xAxes: [
+                {
+                  type: "time",
+                  position: "bottom",
+                  time: {
+                    displayFormats: {
+                      hour: "HH:MM D MMM",
+                    },
+                    stepSize: 4,
+                  },
+                },
+              ],
+            },
+          }}
+          ref={(reference) => setReference(reference)}
+        />
+      </div>
 
-      {interval && interval.start && interval.end && <WordCloud start={interval.start} end={interval.end} />}
+      {interval && (
+        <p>
+          Selection made between
+          <i style={{ textDecoration: "underline" }}>{moment(interval.start).format("HH:MM D MMM")}</i> and{" "}
+          <i>{moment(interval.end).format("HH:MM D MMM")}</i>
+          <Button
+            size="small"
+            variant="text"
+            onClick={() => {
+              setInterval(null);
+            }}
+            endIcon={<CloseIcon fontSize="small" />}
+          >
+            Clear selection
+          </Button>
+        </p>
+      )}
+
+      {interval && <WordCloud start={interval.start} end={interval.end} />}
     </div>
   );
 };
