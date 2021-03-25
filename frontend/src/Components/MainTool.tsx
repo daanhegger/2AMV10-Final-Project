@@ -19,7 +19,10 @@ const MainTool: (props: Props) => JSX.Element | null = (props: Props) => {
       <>
         <StackedPlot />
         <div>
-          <HeatMapCity />
+          <HeatMapCity baseColor="#7591ff" />
+          <HeatMapCity baseColor="red" />
+          <HeatMapCity baseColor="green" />
+          <HeatMapCity baseColor="yellow" />
         </div>
       </>
     );
