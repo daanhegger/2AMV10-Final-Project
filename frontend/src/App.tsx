@@ -66,8 +66,8 @@ function App() {
             Y*int Analyzer
           </Typography>
           <Tabs value={value} onChange={(_, newValue) => setValue(newValue)} aria-label="simple tabs example">
-            <Tab label="Home" {...a11yProps(0)} />
-            <Tab label="Explore" {...a11yProps(1)} />
+            <Tab label="Explore" {...a11yProps(0)} />
+            <Tab label="Investigate" {...a11yProps(1)} />
           </Tabs>
           <IconButton edge="end" color="inherit" onClick={() => setSidebar(!sidebar)}>
             <MenuIcon />
