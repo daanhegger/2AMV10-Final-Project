@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, MenuItem, Select, TextField } from "@material-ui/core";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
 
 interface Props {
   onChange(amount: number, unit: string): void;
@@ -30,19 +30,23 @@ const BinSizeSelector: React.FC<Props> = ({ onChange, defaultValues }) => {
         style={{ width: 100 }}
         value={frequencyAmount}
         onChange={(e) => setFrequencyAmount(parseInt(e.target.value, 10))}
+        size="small"
       />
 
       <div style={{ width: 10 }}></div>
 
-      <Select value={frequencyType} onChange={(e) => setFrequencyType(e.target.value as string)} variant="outlined">
-        <MenuItem value="min">Minute(s)</MenuItem>
-        <MenuItem value="H">Hour(s)</MenuItem>
-        <MenuItem value="S">Second(s)</MenuItem>
-      </Select>
+      <FormControl variant="outlined" size="small">
+        <InputLabel>Unit</InputLabel>
+        <Select value={frequencyType} onChange={(e) => setFrequencyType(e.target.value as string)} variant="outlined" label="Unit">
+          <MenuItem value="min">Minute(s)</MenuItem>
+          <MenuItem value="H">Hour(s)</MenuItem>
+          <MenuItem value="S">Second(s)</MenuItem>
+        </Select>
+      </FormControl>
 
       <div style={{ width: 10 }}></div>
 
-      <Button variant="contained" type="submit">
+      <Button variant="contained" type="submit" size="small">
         Apply
       </Button>
     </form>

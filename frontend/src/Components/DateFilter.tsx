@@ -99,8 +99,8 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex" }}>
-      <FormControl variant="outlined">
+    <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "stretch" }}>
+      <FormControl variant="outlined" size="small">
         <InputLabel>Start</InputLabel>
         <Select value={filterStartDate} onChange={handleStartDateChange} label="Start">
           {dates.map((date) => (
@@ -120,11 +120,12 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         value={new Date(`2020-01-01T${filterStartTime}`)}
         onChange={handleTimeChange("start")}
         style={{ width: 130 }}
+        size="small"
       />
 
       <div style={{ width: 10 }}></div>
 
-      <FormControl variant="outlined">
+      <FormControl variant="outlined" size="small">
         <InputLabel>End</InputLabel>
         <Select value={filterEndDate} onChange={handleEndDateChange} label="End">
           {dates.map((date) => (
@@ -144,17 +145,18 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
         onChange={handleTimeChange("end")}
         inputVariant="outlined"
         style={{ width: 130 }}
+        size="small"
       />
 
       <div style={{ width: 10 }}></div>
 
-      <Button variant="contained" disabled={!validateDates()} type="submit">
+      <Button variant="contained" disabled={!validateDates()} type="submit" size="small">
         Apply
       </Button>
 
       <div style={{ width: 10 }}></div>
 
-      <Button variant="contained" onClick={handleResetView}>
+      <Button variant="contained" onClick={handleResetView} size="small">
         Reset
       </Button>
     </form>
