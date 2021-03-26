@@ -17,9 +17,10 @@ const dataMapper = (data: any, term: any): Coord[] =>
         y: data_row[term.title],
     }));
 
+
 const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; stackgroup: string; groupnorm: string; }[] = []
-  datasets.forEach(dataset => {
+  const data: { name: any; x: any[]; y: any[]; color: string; xaxis: string; yaxis: string; type: string}[] = []
+  datasets.forEach((dataset: any, index: number) => {
     const x: any[] = [];
     const y: any[] = [];
     const label = dataset.label
@@ -31,10 +32,13 @@ const transformDataset = (datasets: any[]) => {
       name: label,
       x: x,
       y: y,
-      stackgroup: 'one',
-      groupnorm:'percent',
+      color: dataset.color,
+      xaxis: `x${index+1}`,
+      yaxis: `y${index+1}`,
+      type: 'scatter'
     })
   })
+  console.log(data)
   return data
 }
 
@@ -133,7 +137,7 @@ const StakedPlot: React.FC = () => {
 
       <Plot
         data={datasets}
-        layout={ {width: 1230, height: 700 } }
+        layout={{grid: {rows: datasets.length, columns: 1, pattern: 'independent'}, width: 1230} }
       />
     </div>
 
