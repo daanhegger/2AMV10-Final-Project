@@ -3,19 +3,19 @@ import { useSnackbar } from "notistack";
 import React from "react";
 import { Topic } from "../../models";
 import FindTerms from "./FindTerms";
-import { ColorPicker } from "material-ui-color";
 
 interface Props {
   topic: Topic;
   onChange(changed: Topic): void;
   onDelete(): void;
+  topics: Topic[];
 }
 
 /**
  * Edit a single topic:
  * - Manage terms, color and delete topic all together
  */
-const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete }) => {
+const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete}) => {
   const { enqueueSnackbar } = useSnackbar();
 
   // Request to delete a term from the topic
@@ -54,16 +54,6 @@ const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete }) => {
     }
   };
 
-  // Update the topic color if the user requested it
-  const handleChangeColor = (newColor?: string) => {
-    if (newColor) {
-      onChange({
-        ...topic,
-        color: newColor,
-      });
-    }
-  };
-
   return (
     <Grid container alignItems="stretch" style={{ height: "100%" }}>
       <Grid item md={6}>
@@ -72,8 +62,7 @@ const EditTopic: React.FC<Props> = ({ topic, onChange, onDelete }) => {
         <div style={{ borderRight: "1px solid #c7c7c7", height: "100%", padding: 10, display: "flex", flexDirection: "column" }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <h3>Topic: {topic.title}</h3>
-            {topic.color}
-            <ColorPicker value={topic.color} onChange={(color) => handleChangeColor(color.css.backgroundColor)} hideTextfield disableAlpha deferred />
+            <Chip style={{backgroundColor: topic.color, opacity: 0.8, width: 25, marginRight: 15, marginLeft: 5}}/>
           </Box>
 
           <div style={{ flex: 1 }}>

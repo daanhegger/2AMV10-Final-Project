@@ -49,7 +49,7 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
             <FormControlLabel
               onClick={(event) => event.stopPropagation()}
               onFocus={(event) => event.stopPropagation()}
-              control={<Chip style={{backgroundColor: topic.color, width: 25, marginRight: 15, marginLeft: 5}}/>}
+              control={<Chip style={{backgroundColor: topic.color, opacity: 0.8, width: 25, marginRight: 15, marginLeft: 5}}/>}
               label={topic.title}
             />
 

@@ -33,6 +33,19 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const activeTopicObject = topics.find((t) => t.title === activeTopic);
 
+  const generalColor = [
+    '#1f77b4',
+    '#ff7f0e',
+    '#2ca02c',
+    '#d62728',
+    '#9467bd',
+    '#8c564b',
+    '#e377c2',
+    '#7f7f7f',
+    '#bcbd22',
+    '#17becf'
+  ];
+
   // When the topics change outside of this component, update them in here too
   useEffect(() => {
     setTopics(globalTopics);
@@ -59,7 +72,7 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
   const handleAddTopic = (title: string) => {
     // No empty title
     if (title) {
-      setTopics([...topics, { title, color: "#FF0000", terms: [] }]);
+      setTopics([...topics, { title, color: generalColor[topics.length], terms: [] }]);
     }
   };
 
@@ -132,7 +145,7 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
           {/* Inspect & Edit active topic */}
           {activeTopicObject ? (
             // Show detail page of topic if a topic is selected
-            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject)} />
+            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject)} topics={globalTopics} />
           ) : (
             // If not topic selected yet, helper text
             <p style={{ padding: 10 }}>No topic selected, choose one from the list on the left</p>
