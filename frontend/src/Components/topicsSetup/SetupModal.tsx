@@ -79,12 +79,20 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
   /**
    * Handle deleteing a topic
    */
-  const handleDeleteTopic = (topic: Topic) => {
+  const handleDeleteTopic = (topic: Topic, topics: Topic[]) => {
+    // The array of new topics
+    let new_topics = topics.filter((t) => t.title !== topic.title)
+
     // Remove topic from list
-    setTopics(topics.filter((t) => t.title !== topic.title));
+    setTopics(new_topics);
 
     // Reset active topic, since a topic can only be removed when it is the active one
     setActiveTopic(null);
+
+    // Recolor all the topics such that it is the same as the plotly colors
+    new_topics.map((topic, index) => (
+      topic.color = generalColor[index]
+    ))
   };
 
   /**
@@ -145,7 +153,7 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
           {/* Inspect & Edit active topic */}
           {activeTopicObject ? (
             // Show detail page of topic if a topic is selected
-            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject)} topics={globalTopics} />
+            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject, topics)} topics={globalTopics} />
           ) : (
             // If not topic selected yet, helper text
             <p style={{ padding: 10 }}>No topic selected, choose one from the list on the left</p>
