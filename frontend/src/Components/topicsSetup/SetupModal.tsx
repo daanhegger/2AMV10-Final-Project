@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, Button, DialogActions, Grid, List, ListItem, DialogTitle, ListItemText, makeStyles, Theme, createStyles } from "@material-ui/core";
+import {
+  Dialog,
+  Button,
+  DialogActions,
+  Grid,
+  List,
+  ListItem,
+  DialogTitle,
+  ListItemText,
+  makeStyles,
+  Theme,
+  createStyles,
+  Snackbar
+} from "@material-ui/core";
 import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
 import EditTopic from "./EditTopic";
 import AddTopic from "./AddTopic";
+import {Alert} from "@material-ui/lab";
+import {Alarm} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,6 +85,12 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
    * Handle adding a new topic to the list given a title
    */
   const handleAddTopic = (title: string) => {
+    // No more then 10 topics
+    if (topics.length > 9) {
+      console.log("max number of items reached")
+      return
+    }
+
     // No empty title
     if (title) {
       setTopics([...topics, { title, color: generalColor[topics.length], terms: [] }]);
@@ -144,7 +165,8 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
             </div>
 
             {/* Simple form to add a new topic */}
-            <AddTopic onAdd={handleAddTopic} />
+              <AddTopic onAdd={handleAddTopic} topics={topics}/>
+            { topics.length >= 10 ? <Alert severity="warning">Maximum number of topics reached</Alert> : null}
           </div>
         </Grid>
 
