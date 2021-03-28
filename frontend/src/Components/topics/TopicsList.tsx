@@ -2,10 +2,9 @@ import React from "react";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { createStyles, FormControlLabel, makeStyles, Theme } from "@material-ui/core";
+import {Chip, createStyles, FormControlLabel, makeStyles, Theme} from "@material-ui/core";
 import truncate from "../../utils/truncate";
 import { Topic } from "../../models";
 
@@ -43,13 +42,13 @@ const TopicsList: React.FC<Props> = ({ topics }) => {
 
   return (
     <>
-      {topics.map((topic: { title: string; terms: string[] }) => (
+      {topics.map((topic: { title: string; color: string; terms: string[] }) => (
         <Accordion key={topic.title} square elevation={0} className={classes.accordion}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} classes={{ content: classes.accordionSummary }}>
             <FormControlLabel
               onClick={(event) => event.stopPropagation()}
               onFocus={(event) => event.stopPropagation()}
-              control={<Checkbox size="small" />}
+              control={<Chip style={{backgroundColor: topic.color, opacity: 0.6, width: 25, marginRight: 15, marginLeft: 5}}/>}
               label={topic.title}
             />
 
