@@ -147,7 +147,7 @@ const StakedPlot: React.FC = () => {
       />
         <Plot id="stacked-plots"
         data={datasets}
-        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230} }
+        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length} }
       />
     </div>
 
