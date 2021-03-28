@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
@@ -37,7 +37,7 @@ const transformDataset = (datasets: any[]) => {
       hoverinfo: 'text+x+y',
     })
   })
-  console.log(data)
+
   return data
 }
 
