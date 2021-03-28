@@ -16,3 +16,13 @@ export interface TermSuggestion {
   score: number;
   vector: { x: number; y: number };
 }
+
+export interface Coord {
+  x: Date;
+  y: number;
+}
+
+export interface Interval {
+  start: string;
+  end: string;
+}

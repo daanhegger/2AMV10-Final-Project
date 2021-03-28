@@ -1,41 +1,37 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
-import DateFilter from "../DateFilter";
-import BinSizeSelector from "../BinSizeSelector";
 import "chartjs-plugin-zoom";
 import { Box, Button } from "@material-ui/core";
 import Overlay from "./Overlay";
 import WordCloud from "./WordCloud";
 import moment from "moment";
 import CloseIcon from "@material-ui/icons/Close";
-import {AppContext} from "../../context/topicsContext";
+import { Coord } from "../../models";
+import { dataMapperToChartjs } from "../../utils/parsers";
+import { Interval } from "../../models";
 
-type Coord = { x: Date; y: number };
-
-/**
- * Map Flask object response to coordinate-array
- */
-const dataMapper = (data: Record<string, number>): Coord[] =>
-  Object.keys(data).map<Coord>((key, i) => ({
-    x: new Date(parseInt(key)),
-    y: data[key],
-    fillColor: "#FF0000",
-  }));
+interface Props {
+  frequencyType: string;
+  frequencyAmount: number;
+  interval?: Interval;
+  start: string;
+  end: string;
+}
 
 /**
  * Plot frequency of messages over time
  */
-const VolumePlot: React.FC = () => {
-  // Binsize settings
-  const defaultValues = { amount: 1, unit: "H" };
-  const { frequencyType, setFrequencyType, frequencyAmount, setFrequencyAmount } = useContext(AppContext);
+const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end }) => {
+  // Datapoints from server
+  const [points, setPoints] = useState<Coord[]>([]);
 
+  // HTTP status
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [points, setPoints] = useState<Coord[]>([]);
-  const [interval, setInterval] = useState<{ start: string; end: string } | null>(null);
+  // (local) Interval for wordcloud only, not for sharing with other plots
+  const [interval, setInterval] = useState<Interval | null>(null);
 
   // Referece to chartjs instance
   const [reference, setReference] = useState<any>(null);
@@ -65,32 +61,6 @@ const VolumePlot: React.FC = () => {
     [points]
   );
 
-  function updateConfigByMutating(chart: any, start?: string, end?: string) {
-    let lineChart = chart.chartInstance;
-
-    const change = {
-      xAxes: [
-        {
-          type: "time",
-          position: "bottom",
-          ticks: {
-            min: start, //e.g. "2020-04-09 01:58:00"
-            max: end,
-          },
-          time: {
-            displayFormats: {
-              hour: "HH:MM D MMM",
-            },
-            stepSize: 4,
-          },
-        },
-      ],
-    };
-
-    lineChart.config.options.scales = change;
-    lineChart.update();
-  }
-
   /**
    * Every time parameters change, reload all datasets
    */
@@ -104,7 +74,7 @@ const VolumePlot: React.FC = () => {
           },
         });
 
-        setPoints(dataMapper(response.data));
+        setPoints(dataMapperToChartjs(response.data));
       } catch (e) {
         setError(true);
       } finally {
@@ -122,29 +92,6 @@ const VolumePlot: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        {/* Plot settings */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Filter date */}
-          <DateFilter
-            onChange={(start, end) => {
-              updateConfigByMutating(reference, start, end);
-            }}
-          ></DateFilter>
-
-          {/* Options for frequency */}
-          <BinSizeSelector
-            onChange={(amount, type) => {
-              setFrequencyType(type);
-              setFrequencyAmount(amount);
-            }}
-            defaultValues={defaultValues}
-          />
-        </div>
-      </div>
-
-      <Box mt={3} />
-
       <div>
         {/* Overlay for drag-selection */}
         {reference && reference.chartInstance.canvas && <Overlay chart={reference.chartInstance} onInterval={onInterval} />}
@@ -173,7 +120,11 @@ const VolumePlot: React.FC = () => {
               },
             ],
           }}
+          height={100}
           options={{
+            legend: {
+              display: false,
+            },
             scales: {
               xAxes: [
                 {
@@ -181,9 +132,16 @@ const VolumePlot: React.FC = () => {
                   position: "bottom",
                   time: {
                     displayFormats: {
-                      hour: "HH:MM D MMM",
+                      hour: "D MMM HH:MM",
                     },
                     stepSize: 4,
+                  },
+                  ticks: {
+                    autoSkip: false,
+                    maxRotation: 25,
+                    minRotation: 25,
+                    min: start, //e.g. "2020-04-09 01:58:00"
+                    max: end,
                   },
                 },
               ],
@@ -193,24 +151,21 @@ const VolumePlot: React.FC = () => {
         />
       </div>
 
+      {/* Helper text and buttons to manage drag selection */}
       {interval && (
-        <p>
-          Selection made between
-          <i style={{ textDecoration: "underline" }}>{moment(interval.start).format("HH:MM D MMM")}</i> and{" "}
-          <i>{moment(interval.end).format("HH:MM D MMM")}</i>
-          <Button
-            size="small"
-            variant="text"
-            onClick={() => {
-              setInterval(null);
-            }}
-            endIcon={<CloseIcon fontSize="small" />}
-          >
-            Clear selection
-          </Button>
-        </p>
+        <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
+          <p>
+            Showing most frequent words from {moment(interval.start).format("HH:MM D MMM")} to {moment(interval.end).format("HH:MM D MMM")}
+          </p>
+          <div>
+            <Button size="small" variant="outlined" onClick={() => setInterval(null)} endIcon={<CloseIcon fontSize="small" />}>
+              Clear selection
+            </Button>
+          </div>
+        </Box>
       )}
 
+      {/* When interval selected, show wordcloud */}
       {interval && <WordCloud start={interval.start} end={interval.end} />}
     </div>
   );

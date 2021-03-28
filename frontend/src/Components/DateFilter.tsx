@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { KeyboardTimePicker } from "@material-ui/pickers";
-import { FormControl, InputLabel, Select, MenuItem, Button } from "@material-ui/core";
+import { FormControl, InputLabel, Select, MenuItem, Button, Tooltip } from "@material-ui/core";
 import moment from "moment";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import ScheduleIcon from "@material-ui/icons/Schedule";
 
 const dates: string[] = ["2020-04-06", "2020-04-07", "2020-04-08", "2020-04-09", "2020-04-10"];
 
-const defaultView = {
+export const defaultView = {
   startDate: "2020-04-06",
   endDate: "2020-04-10",
   startTime: "00:00:00",
@@ -99,8 +100,8 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex" }}>
-      <FormControl variant="outlined">
+    <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "stretch" }}>
+      <FormControl variant="outlined" size="small">
         <InputLabel>Start</InputLabel>
         <Select value={filterStartDate} onChange={handleStartDateChange} label="Start">
           {dates.map((date) => (
@@ -115,16 +116,17 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
 
       <KeyboardTimePicker
         ampm={false}
-        label="Start"
         inputVariant="outlined"
         value={new Date(`2020-01-01T${filterStartTime}`)}
         onChange={handleTimeChange("start")}
         style={{ width: 130 }}
+        size="small"
+        keyboardIcon={<ScheduleIcon />}
       />
 
       <div style={{ width: 10 }}></div>
 
-      <FormControl variant="outlined">
+      <FormControl variant="outlined" size="small">
         <InputLabel>End</InputLabel>
         <Select value={filterEndDate} onChange={handleEndDateChange} label="End">
           {dates.map((date) => (
@@ -139,24 +141,27 @@ const DateFilter: React.FC<Props> = ({ onChange }) => {
 
       <KeyboardTimePicker
         ampm={false}
-        label="End"
         value={new Date(`2020-01-01T${filterEndTime}`)}
         onChange={handleTimeChange("end")}
         inputVariant="outlined"
         style={{ width: 130 }}
+        size="small"
+        keyboardIcon={<ScheduleIcon />}
       />
 
       <div style={{ width: 10 }}></div>
 
-      <Button variant="contained" disabled={!validateDates()} type="submit">
+      <Button variant="contained" disabled={!validateDates()} type="submit" size="small">
         Apply
       </Button>
 
       <div style={{ width: 10 }}></div>
 
-      <Button variant="contained" onClick={handleResetView}>
-        Reset
-      </Button>
+      <Tooltip title="View dataset from start to end">
+        <Button variant="contained" onClick={handleResetView} size="small">
+          Reset
+        </Button>
+      </Tooltip>
     </form>
   );
 };

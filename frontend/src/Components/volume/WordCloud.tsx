@@ -44,7 +44,7 @@ const WordCloud: React.FC<Props> = ({ start, end }) => {
 
   const callbacks: Optional<Callbacks> = {
     getWordColor: (word) => {
-      return `rgba(0, 0, 255, ${word.value / maxFreq})`;
+      return `rgba(0, 0, 255, ${(word.value * 2) / maxFreq})`;
     },
   };
 
