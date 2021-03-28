@@ -43,21 +43,6 @@ const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor }) => {
     map
       .enter()
       .append("svg:text")
-      .text("regel 1")
-      .attr("x", function (neighbourhoodFeature: any) {
-        return geoGenerator.centroid(neighbourhoodFeature)[0];
-      })
-      .attr("y", function (neighbourhoodFeature: any) {
-        return geoGenerator.centroid(neighbourhoodFeature)[1] + 10;
-      })
-      .attr("text-anchor", "middle")
-      .attr("fill", "black")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "6pt");
-
-    map
-      .enter()
-      .append("svg:text")
       .text(function (neighbourhoodFeature: any) {
         return neighbourhoodFeature.properties.Nbrhood + " (8 tweets)";
       })

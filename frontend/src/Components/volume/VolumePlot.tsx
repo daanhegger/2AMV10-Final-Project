@@ -10,6 +10,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { Coord } from "../../models";
 import { dataMapperToChartjs } from "../../utils/parsers";
 import { Interval } from "../../models";
+import { Disable } from "react-disable";
 
 interface Props {
   frequencyType: string;
@@ -30,6 +31,8 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
+  const [loadingWordCloud, setLoadingWordCloud] = useState(false);
+
   // (local) Interval for wordcloud only, not for sharing with other plots
   const [interval, setInterval] = useState<Interval | null>(null);
 
@@ -39,11 +42,12 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
   // useCallback such that the function is not re-generated after each re-render
   // this way the overlay is only re-triggered when needed
   const onInterval = useCallback(
-    (start, end) => {
+    (startIndex, endIndex) => {
       if (points.length > 0) {
+        console.log(points.length);
         // Make sure the start date is the earliest date (most left point)
-        const startDate = points[start <= end ? start : end].x;
-        const endDate = points[end >= start ? end : start].x;
+        const startDate = points[startIndex <= endIndex ? startIndex : endIndex].x;
+        const endDate = points[endIndex >= startIndex ? endIndex : startIndex].x;
 
         // Don't allow selection if the window size is 0
         // (both dates are equal)
@@ -77,12 +81,17 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
         setPoints(dataMapperToChartjs(response.data));
       } catch (e) {
         setError(true);
+        setPoints([]);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
   }, [frequencyType, frequencyAmount]);
+
+  useEffect(() => {
+    setInterval(null);
+  }, [frequencyType, frequencyAmount, start, end]);
 
   /**
    * Network handlers
@@ -92,64 +101,66 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
   return (
     <div>
-      <div>
-        {/* Overlay for drag-selection */}
-        {reference && reference.chartInstance.canvas && <Overlay chart={reference.chartInstance} onInterval={onInterval} />}
+      <Disable disabled={loadingWordCloud}>
+        <div>
+          {/* Overlay for drag-selection */}
+          {reference && reference.chartInstance.canvas && <Overlay chart={reference.chartInstance} onInterval={onInterval} />}
 
-        {/* React version of chart.js for easy plotting */}
-        <Line
-          data={{
-            datasets: [
-              {
-                label: "All tweets",
-                data: points,
-                backgroundColor: "rgb(65,83,175, 0.1)",
-                borderColor: "rgb(65,83,175,0.6)",
-                /**
-                 * Color the points yellow if they are in the selection
-                 */
-                pointBackgroundColor: (ctx) => {
-                  if (interval && ctx.dataIndex !== undefined) {
-                    const p = points[ctx.dataIndex];
-                    if (moment(p.x).format("YYYY-MM-DD HH:mm:ss") >= interval.start && moment(p.x).format("YYYY-MM-DD HH:mm:ss") <= interval.end) {
-                      return "#FF0000";
-                    }
-                  }
-                  return "rgb(65,83,175, 0.1)";
-                },
-              },
-            ],
-          }}
-          height={100}
-          options={{
-            legend: {
-              display: false,
-            },
-            scales: {
-              xAxes: [
+          {/* React version of chart.js for easy plotting */}
+          <Line
+            data={{
+              datasets: [
                 {
-                  type: "time",
-                  position: "bottom",
-                  time: {
-                    displayFormats: {
-                      hour: "D MMM HH:MM",
-                    },
-                    stepSize: 4,
-                  },
-                  ticks: {
-                    autoSkip: false,
-                    maxRotation: 25,
-                    minRotation: 25,
-                    min: start, //e.g. "2020-04-09 01:58:00"
-                    max: end,
+                  label: "All tweets",
+                  data: points,
+                  backgroundColor: "rgb(65,83,175, 0.1)",
+                  borderColor: "rgb(65,83,175,0.6)",
+                  /**
+                   * Color the points yellow if they are in the selection
+                   */
+                  pointBackgroundColor: (ctx) => {
+                    if (interval && ctx.dataIndex !== undefined) {
+                      const p = points[ctx.dataIndex];
+                      if (moment(p.x).format("YYYY-MM-DD HH:mm:ss") >= interval.start && moment(p.x).format("YYYY-MM-DD HH:mm:ss") <= interval.end) {
+                        return "#FF0000";
+                      }
+                    }
+                    return "rgb(65,83,175, 0.1)";
                   },
                 },
               ],
-            },
-          }}
-          ref={(reference) => setReference(reference)}
-        />
-      </div>
+            }}
+            height={100}
+            options={{
+              legend: {
+                display: false,
+              },
+              scales: {
+                xAxes: [
+                  {
+                    type: "time",
+                    position: "bottom",
+                    time: {
+                      displayFormats: {
+                        hour: "D MMM HH:MM",
+                      },
+                      stepSize: 4,
+                    },
+                    ticks: {
+                      autoSkip: false,
+                      maxRotation: 25,
+                      minRotation: 25,
+                      min: start, //e.g. "2020-04-09 01:58:00"
+                      max: end,
+                    },
+                  },
+                ],
+              },
+            }}
+            ref={(reference) => setReference(reference)}
+          />
+        </div>
+      </Disable>
 
       {/* Helper text and buttons to manage drag selection */}
       {interval && (
@@ -166,7 +177,7 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
       )}
 
       {/* When interval selected, show wordcloud */}
-      {interval && <WordCloud start={interval.start} end={interval.end} />}
+      {interval && <WordCloud start={interval.start} end={interval.end} onLoading={(state) => setLoadingWordCloud(state)} />}
     </div>
   );
 };
