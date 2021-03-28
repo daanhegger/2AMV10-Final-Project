@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, Button, DialogActions, Grid, List, ListItem, DialogTitle, ListItemText, makeStyles, Theme, createStyles } from "@material-ui/core";
+import {
+  Dialog,
+  Button,
+  DialogActions,
+  Grid,
+  List,
+  ListItem,
+  DialogTitle,
+  ListItemText,
+  makeStyles,
+  Theme,
+  createStyles,
+  Snackbar
+} from "@material-ui/core";
 import { Topic } from "../../models";
 import truncate from "../../utils/truncate";
 import EditTopic from "./EditTopic";
 import AddTopic from "./AddTopic";
+import {Alert} from "@material-ui/lab";
+import {Alarm} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +48,19 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const activeTopicObject = topics.find((t) => t.title === activeTopic);
 
+  const generalColor = [
+    '#1f77b4',
+    '#ff7f0e',
+    '#2ca02c',
+    '#d62728',
+    '#9467bd',
+    '#8c564b',
+    '#e377c2',
+    '#7f7f7f',
+    '#bcbd22',
+    '#17becf'
+  ];
+
   // When the topics change outside of this component, update them in here too
   useEffect(() => {
     setTopics(globalTopics);
@@ -57,21 +85,35 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
    * Handle adding a new topic to the list given a title
    */
   const handleAddTopic = (title: string) => {
+    // No more then 10 topics
+    if (topics.length > 9) {
+      console.log("max number of items reached")
+      return
+    }
+
     // No empty title
     if (title) {
-      setTopics([...topics, { title, color: "#FF0000", terms: [] }]);
+      setTopics([...topics, { title, color: generalColor[topics.length], terms: [] }]);
     }
   };
 
   /**
    * Handle deleteing a topic
    */
-  const handleDeleteTopic = (topic: Topic) => {
+  const handleDeleteTopic = (topic: Topic, topics: Topic[]) => {
+    // The array of new topics
+    let new_topics = topics.filter((t) => t.title !== topic.title)
+
     // Remove topic from list
-    setTopics(topics.filter((t) => t.title !== topic.title));
+    setTopics(new_topics);
 
     // Reset active topic, since a topic can only be removed when it is the active one
     setActiveTopic(null);
+
+    // Recolor all the topics such that it is the same as the plotly colors
+    new_topics.map((topic, index) => (
+      topic.color = generalColor[index]
+    ))
   };
 
   /**
@@ -123,7 +165,8 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
             </div>
 
             {/* Simple form to add a new topic */}
-            <AddTopic onAdd={handleAddTopic} />
+              <AddTopic onAdd={handleAddTopic} topics={topics}/>
+            { topics.length >= 10 ? <Alert severity="warning">Maximum number of topics reached</Alert> : null}
           </div>
         </Grid>
 
@@ -132,7 +175,7 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
           {/* Inspect & Edit active topic */}
           {activeTopicObject ? (
             // Show detail page of topic if a topic is selected
-            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject)} />
+            <EditTopic topic={activeTopicObject} onChange={handleTopicChange} onDelete={() => handleDeleteTopic(activeTopicObject, topics)} topics={globalTopics} />
           ) : (
             // If not topic selected yet, helper text
             <p style={{ padding: 10 }}>No topic selected, choose one from the list on the left</p>
