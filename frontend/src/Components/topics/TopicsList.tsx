@@ -2,10 +2,9 @@ import React from "react";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import {Badge, Chip, createStyles, FormControlLabel, makeStyles, Theme} from "@material-ui/core";
+import {Chip, createStyles, FormControlLabel, makeStyles, Theme} from "@material-ui/core";
 import truncate from "../../utils/truncate";
 import { Topic } from "../../models";
 

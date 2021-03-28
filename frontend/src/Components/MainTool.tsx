@@ -8,7 +8,7 @@ interface Props {
 }
 const MainTool: (props: Props) => (JSX.Element | null) = (props: Props) => {
   const { window } = props;
-  if (window == 0){ //home screen
+  if (window === 0){ //home screen
     return (
       <>
         <VolumePlot />
@@ -16,7 +16,7 @@ const MainTool: (props: Props) => (JSX.Element | null) = (props: Props) => {
       </>
     );
   }
-  if (window == 1){ //stacked plot screen
+  if (window === 1){ //stacked plot screen
     return (
       <>
         <StackedPlot />
