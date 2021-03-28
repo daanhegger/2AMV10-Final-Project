@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import DateFilter from "../DateFilter";
@@ -9,6 +9,7 @@ import Overlay from "./Overlay";
 import WordCloud from "./WordCloud";
 import moment from "moment";
 import CloseIcon from "@material-ui/icons/Close";
+import {AppContext} from "../../context/topicsContext";
 
 type Coord = { x: Date; y: number };
 
@@ -28,8 +29,7 @@ const dataMapper = (data: Record<string, number>): Coord[] =>
 const VolumePlot: React.FC = () => {
   // Binsize settings
   const defaultValues = { amount: 1, unit: "H" };
-  const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
-  const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
+  const { frequencyType, setFrequencyType, frequencyAmount, setFrequencyAmount } = useContext(AppContext);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
