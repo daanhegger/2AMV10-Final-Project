@@ -4,10 +4,19 @@ import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
 import {TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
+import {Interval} from "../../models";
 
 /**
  * Map Flask object response to coordinate-array
  */
+interface Props {
+  frequencyType: string;
+  frequencyAmount: number;
+  interval?: Interval;
+  start: string;
+  end: string;
+}
+
 type Coord = { x: number | Date | string; y: number};
 
 const dataMapper = (data: any, term: any): Coord[] =>
@@ -66,10 +75,9 @@ const locationList = [
 /**
  * Plot frequency of messages over time
  */
-const StakedPlot: React.FC = () => {
+const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end }) => {
   const { topics } = useContext(AppContext);
 
-  const { frequencyType, frequencyAmount } = useContext(AppContext);
   const [datasets, setDatasets] = useState<any []>([]);
 
   const [loading, setLoading] = useState(false);
@@ -147,7 +155,8 @@ const StakedPlot: React.FC = () => {
       />
         <Plot id="stacked-plots"
         data={datasets}
-        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length} }
+        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length,
+          xaxis: { range: [start, end] }} }
       />
     </div>
 
