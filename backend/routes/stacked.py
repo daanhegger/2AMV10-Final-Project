@@ -24,6 +24,12 @@ def stacked():
         abort(400, 'Invalid frequency amount')
         return
 
+    # default values & validation
+    if freq_type is None: freq_type = "H"
+    if freq_amount is None: freq_amount = 1
+    if freq_type not in ["H", "min", "S"] or freq_amount < 0:
+        abort(400, 'Invalid frequency')
+
     location = request.args.get('location')
 
     if location == 'Undefined':
@@ -39,9 +45,6 @@ def stacked():
         if len(topics_json) > 0:
             topics = topics_json
 
-    # default values & validation
-    if freq_type is None: freq_type = "H"
-    if freq_amount is None: freq_amount = 1
 
     group_frequency = str(freq_amount) + str(freq_type)
 

@@ -16,10 +16,8 @@ const dataMapper = (data: any, term: any): Coord[] =>
         x: new Date(parseInt(data_row.time)),
         y: data_row[term.title],
     }));
-
-
 const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; color: string; xaxis: string; yaxis: string; type: string}[] = []
+  const data: { name: any; x: any[]; y: any[]; color: string; xaxis: string; yaxis: string; type: string; hoverinfo: string}[] = []
   datasets.forEach((dataset: any, index: number) => {
     const x: any[] = [];
     const y: any[] = [];
@@ -33,9 +31,10 @@ const transformDataset = (datasets: any[]) => {
       x: x,
       y: y,
       color: dataset.color,
-      xaxis: `x${index+1}`,
+      xaxis: `x`,
       yaxis: `y${index+1}`,
-      type: 'scatter'
+      type: 'scatter',
+      hoverinfo: 'text+x+y',
     })
   })
   console.log(data)
@@ -69,7 +68,8 @@ const locationList = [
  */
 const StakedPlot: React.FC = () => {
   const { topics } = useContext(AppContext);
-  const defaultValues = useMemo(() => ({ amount: 1, unit: "H" }), []);
+
+  const { frequencyType, frequencyAmount } = useContext(AppContext);
   const [datasets, setDatasets] = useState<any []>([]);
 
   const [loading, setLoading] = useState(false);
@@ -88,8 +88,8 @@ const StakedPlot: React.FC = () => {
             axios.get("http://localhost:5000/stacked", {
               params: {
                 location: location,
-                freq_type: defaultValues.unit,
-                freq_amount: defaultValues.amount,
+                freq_type: frequencyType,
+                freq_amount: frequencyAmount,
                 topics: JSON.stringify(topic),
               },
             })
@@ -118,13 +118,24 @@ const StakedPlot: React.FC = () => {
       }
     };
     fetchData();
-  }, [topics, defaultValues, location]);
+  }, [topics, frequencyType, frequencyAmount, location]);
 
   /**
    * Network handlers
    */
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
+
+  const setSubPlots = datasets.map((_, index: number) => `xy${index}`)
+
+  // var plot = document.getElementById("stacked-plots")
+  // plot.on( 'plotly_hover',function (eventdata: any){
+  //       if(eventdata.yvals)
+  //       {
+  //         console.log(eventdata.yvals);
+  //           Plot.Fx.hover(plot, {yval:eventdata.xyvals[0] }, setSubPlots);
+  //       }
+  //   })
 
   return (
     <div>
@@ -134,10 +145,9 @@ const StakedPlot: React.FC = () => {
           options={locationList}
           renderInput={(params) => <TextField {...params} label="Filter on location" variant="outlined" />}
       />
-
-      <Plot
+        <Plot id="stacked-plots"
         data={datasets}
-        layout={{grid: {rows: datasets.length, columns: 1, pattern: 'independent'}, width: 1230} }
+        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230} }
       />
     </div>
 
