@@ -61,7 +61,7 @@ const MainTool: React.FC = () => {
       </Box>
 
       {/* Stacked plot for investigation into topics */}
-      <StackedPlot />
+      <StackedPlot frequencyType={frequencyType} frequencyAmount={frequencyAmount} start={interval.start} end={interval.end}/>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" margin="50px 0 30px">
         <h3 style={{ margin: 0 }}>Compare popularity of topics per region</h3>
