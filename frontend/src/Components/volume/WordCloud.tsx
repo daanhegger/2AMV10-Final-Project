@@ -16,6 +16,8 @@ const options: Optional<Options> = {
   fontSizes: [5, 65],
   fontStyle: "normal",
   fontWeight: "normal",
+
+  deterministic: true,
 };
 
 interface Props {
