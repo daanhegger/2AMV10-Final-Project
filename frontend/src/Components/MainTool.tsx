@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import VolumePlot from "./volume/VolumePlot";
 import StackedPlot from "./stacked/stackedPlot";
-import HeatMapCity from "./heatmap/HeatMapCity";
-import { Box, Grid } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import DateFilter, { defaultView } from "./DateFilter";
 import BinSizeSelector from "./BinSizeSelector";
 import { Interval } from "../models";
+import HeatMapView from "./heatmap/HeatMapView";
 
 /**
  * Main part of the tool where all connected interactive visualizations
@@ -68,23 +68,23 @@ const MainTool: React.FC = () => {
         <p style={{ margin: 0 }}>Use the time-tools to manage your sliding window</p>
       </Box>
 
-      {/* Temporary: grid of heatmaps */}
-      <div>
-        <Grid container>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="#7591ff" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="red" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="green" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="yellow" />
-          </Grid>
-        </Grid>
+      {/* Plot settings */}
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        {/* Filter date */}
+        {/* Spotify controls */}
+
+        {/* Options for frequency */}
+        <BinSizeSelector
+          onChange={(amount, type) => {
+            setFrequencyType(type);
+            setFrequencyAmount(amount);
+          }}
+          defaultValues={defaultValues}
+        />
       </div>
+
+      {/* Temporary: grid of heatmaps */}
+      <HeatMapView frequencyType={frequencyType} frequencyAmount={frequencyAmount} />
     </div>
   );
 };

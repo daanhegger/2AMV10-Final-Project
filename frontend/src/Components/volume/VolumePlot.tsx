@@ -44,7 +44,6 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
   const onInterval = useCallback(
     (startIndex, endIndex) => {
       if (points.length > 0) {
-        console.log(points.length);
         // Make sure the start date is the earliest date (most left point)
         const startDate = points[startIndex <= endIndex ? startIndex : endIndex].x;
         const endDate = points[endIndex >= startIndex ? endIndex : startIndex].x;
