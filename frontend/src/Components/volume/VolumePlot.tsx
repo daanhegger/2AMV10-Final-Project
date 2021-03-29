@@ -141,7 +141,7 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
                     position: "bottom",
                     time: {
                       displayFormats: {
-                        hour: "D MMM HH:MM",
+                        hour: "D MMM HH:mm",
                       },
                       stepSize: 4,
                     },
@@ -165,7 +165,7 @@ const VolumePlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
       {interval && (
         <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
           <p>
-            Showing most frequent words from {moment(interval.start).format("HH:MM D MMM")} to {moment(interval.end).format("HH:MM D MMM")}
+            Showing most frequent words from {moment(interval.start).format("HH:mm D MMM")} to {moment(interval.end).format("HH:mm D MMM")}
           </p>
           <div>
             <Button size="small" variant="outlined" onClick={() => setInterval(null)} endIcon={<CloseIcon fontSize="small" />}>

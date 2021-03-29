@@ -1,71 +1,99 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import Plot from 'react-plotly.js';
-import {AppContext} from "../../context/topicsContext";
-import {Interval} from "../../models";
+import Plot from "react-plotly.js";
+import { AppContext } from "../../context/topicsContext";
+import { Interval } from "../../models";
 import moment from "moment";
 
 /**
  * Map Flask object response to coordinate-array
  */
+type Coord = { x: number | Date | string; y: number };
+
+const dataMapper = (data: any, term: any): Coord[] =>
+  data.map((data_row: any) => ({
+    x: new Date(parseInt(data_row.time)),
+    y: data_row[term.title],
+  }));
+const transformDataset = (datasets: any[]) => {
+  const data: { name: any; x: any[]; y: any[]; marker: any; xaxis: string; yaxis: string; type: string; hoverinfo: string }[] = [];
+  datasets.forEach((dataset: any, index: number) => {
+    const x: any[] = [];
+    const y: any[] = [];
+    const label = dataset.label;
+    dataset.data.forEach((tuple: any) => {
+      x.push(tuple.x);
+      y.push(tuple.y);
+    });
+    data.push({
+      name: label,
+      x: x,
+      y: y,
+      marker: { color: dataset.color },
+      xaxis: `x`,
+      yaxis: `y${index + 1}`,
+      type: "scatter",
+      hoverinfo: "text+x+y",
+    });
+  });
+
+  return data;
+};
+const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
+
 interface Props {
   frequencyType: string;
   frequencyAmount: number;
   interval?: Interval;
   start: string;
   end: string;
-  setInterval(data: string) : void;
+  setInterval(data: string): void;
   location: string;
+  startWindow?: string;
+  endWindow?: string;
+  setStartWindow(sw: string): void;
 }
-
-type Coord = { x: number | Date | string; y: number};
-
-const dataMapper = (data: any, term: any): Coord[] =>
-    data.map((data_row: any) => ({
-
-        x: new Date(parseInt(data_row.time)),
-        y: data_row[term.title],
-    }));
-const transformDataset = (datasets: any[]) => {
-  const data: { name: any; x: any[]; y: any[]; marker: any; xaxis: string; yaxis: string; type: string; hoverinfo: string}[] = []
-  datasets.forEach((dataset: any, index: number) => {
-    const x: any[] = [];
-    const y: any[] = [];
-    const label = dataset.label
-    dataset.data.forEach( (tuple: any) => {
-      x.push(tuple.x);
-      y.push(tuple.y);
-    })
-    data.push({
-      name: label,
-      x: x,
-      y: y,
-      marker: {color: dataset.color},
-      xaxis: `x`,
-      yaxis: `y${index+1}`,
-      type: 'scatter',
-      hoverinfo: 'text+x+y',
-    })
-  })
-
-  return data
-}
-const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 /**
  * Plot frequency of messages over time
  */
-const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end, interval, setInterval , location}) => {
+const StakedPlot: React.FC<Props> = ({
+  frequencyType,
+  frequencyAmount,
+  start,
+  end,
+  setInterval,
+  location,
+  startWindow,
+  endWindow,
+  setStartWindow,
+}) => {
   const { topics } = useContext(AppContext);
 
-  const [datasets, setDatasets] = useState<any []>([]);
+  const [datasets, setDatasets] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [selected, setSelected] = useState( interval || {start: '0', end: '0'})
+  const shapes =
+    startWindow && endWindow
+      ? datasets.map((dataset, index: number) => ({
+          type: "rect",
+          xref: "x",
+          yref: `y${index + 1}`,
+          x0: moment(startWindow).subtract(30, "minutes").format("YYYY-MM-DD HH:mm:ss"),
+          y0: 0,
+          x1: moment(startWindow).add(30, "minutes").format("YYYY-MM-DD HH:mm:ss"),
+          y1: Math.max.apply(Math, dataset.y),
+          fillcolor: "#000",
+          opacity: 0.2,
+          line: {
+            width: 0,
+          },
+        }))
+      : [];
 
-  const [shapes, setShapes] = useState(datasets.map((dataset, index: number) => ({ type: 'line', xref: 'x', yref: `y${index + 1}`, x0: selected.start, y0: 0, x1: selected.start, y1: Math.max.apply(Math, dataset.y), fillcolor: '#FA8072', opacity: 0.2, line: {width: 0}})))
+  console.log(shapes);
 
   /**
    * Every time parameters change, reload all datasets
@@ -85,22 +113,22 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
             })
           )
         );
-        
-        var data: any[] = []
 
-        if(topics){
-            responses.map(response => (
-              topics.forEach(topic => {
-                console.log(response)
-                if (data.filter(data => data.label === topic.title).length === 0 && response.data[0][topic.title]){
-                  data.push({label: topic.title, data: dataMapper(response.data, topic), color: topic.color})
-                }
-              })
-            ))
+        console.log(responses);
+
+        var data: any[] = [];
+
+        if (topics) {
+          responses.map((response) =>
+            topics.forEach((topic) => {
+              if (data.filter((data) => data.label === topic.title).length === 0 && response.data[0][topic.title]) {
+                data.push({ label: topic.title, data: dataMapper(response.data, topic), color: topic.color });
+              }
+            })
+          );
         }
 
-        setDatasets(transformDataset(data))
-
+        setDatasets(transformDataset(data));
       } catch (e) {
         setError(true);
       } finally {
@@ -110,27 +138,13 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
     fetchData();
   }, [topics, frequencyType, frequencyAmount, location]);
 
-  useEffect(() => (
-    setShapes(datasets.map((dataset, index: number) => ({
-                        type: 'rect',
-                        xref: 'x',
-                        yref: `y${index + 1}`,
-                        x0: selected.start,
-                        y0: 0,
-                        x1: selected.end,
-                        y1: Math.max.apply(Math, dataset.y),
-                        fillcolor: '#FA8072',
-                        opacity: 0.2,
-                        line: {
-                            width: 0
-                        }
-                      })))
-  ), [selected])
-
-  const selectedDate = useCallback((event: any) => {
-    setSelected({start: event.points[0].x, end: moment(event.points[0].x).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss")})
-    setInterval(event.points[0].x);
-  }, [])
+  const selectedDate = useCallback(
+    (event: any) => {
+      setStartWindow(event.points[0].x);
+      setInterval(event.points[0].x);
+    },
+    [setInterval, setStartWindow]
+  );
 
   /**
    * Network handlers
@@ -138,19 +152,23 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error!</p>;
 
-  const setSubPlots = datasets.map((_, index: number) => `xy${index}`)
+  const setSubPlots = datasets.map((_, index: number) => `xy${index}`);
 
   return (
     <div>
-        <Plot id="stacked-plots"
-              data={datasets}
-              layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length,
-                      xaxis: { range: [start, end] }, shapes: shapes}
-              }
-              onClick={(event: any) => selectedDate(event)}
+      <Plot
+        id="stacked-plots"
+        data={datasets}
+        layout={{
+          grid: { rows: datasets.length, columns: 1, subplots: setSubPlots },
+          width: 1230,
+          height: 200 * datasets.length,
+          xaxis: { range: [start, end] },
+          shapes: shapes,
+        }}
+        onClick={(event: any) => selectedDate(event)}
       />
     </div>
-
   );
 };
 

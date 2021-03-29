@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import VolumePlot from "./volume/VolumePlot";
 import StackedPlot from "./stacked/stackedPlot";
-import { Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import DateFilter, { defaultView } from "./DateFilter";
 import BinSizeSelector from "./BinSizeSelector";
 import { Interval } from "../models";
 import HeatMapView from "./heatmap/HeatMapView";
+import moment from "moment";
+
+// Convert time units from pd.Grouper to moment
+export const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 /**
  * Main part of the tool where all connected interactive visualizations
@@ -17,13 +21,19 @@ const MainTool: React.FC = () => {
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
   // selected on stacked plot date
-  const [hour, setHour] = useState<string>('')
-  const [location, selectLocation] = useState<string>('')
+  const [hour, setHour] = useState<string>("");
+  const [location, selectLocation] = useState<string>("");
 
   const [interval, setInterval] = useState<Interval>({
     start: defaultView.startDate + " " + defaultView.startTime,
     end: defaultView.endDate + " " + defaultView.endTime,
   });
+
+  /**
+   * Start and end state for stackedPlot + Heatmap
+   */
+  const [startWindow, setStartWindow] = useState("2020-04-06 00:00:00");
+  const endWindow = moment(startWindow).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss");
 
   return (
     <div>
@@ -65,7 +75,17 @@ const MainTool: React.FC = () => {
       </Box>
 
       {/* Stacked plot for investigation into topics */}
-      <StackedPlot frequencyType={frequencyType} frequencyAmount={frequencyAmount} start={interval.start} end={interval.end} setInterval={(data: string) => setHour(data)} location={location}/>
+      <StackedPlot
+        frequencyType={frequencyType}
+        frequencyAmount={frequencyAmount}
+        start={interval.start}
+        end={interval.end}
+        setInterval={(data: string) => setHour(data)}
+        location={location}
+        startWindow={startWindow}
+        endWindow={endWindow}
+        setStartWindow={setStartWindow}
+      />
 
       <Box display="flex" justifyContent="space-between" alignItems="center" margin="50px 0 30px">
         <h3 style={{ margin: 0 }}>Compare popularity of topics per region</h3>
@@ -73,9 +93,46 @@ const MainTool: React.FC = () => {
       </Box>
 
       {/* Plot settings */}
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        {/* Filter date */}
-        {/* Spotify controls */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Edit window  */}
+        <div style={{ display: "flex" }}>
+          <div>
+            <table>
+              <tr>
+                <td>Start</td>
+                <td>{moment(startWindow).format("HH:mm D MMM")}</td>
+              </tr>
+              <tr>
+                <td>End</td>
+                <td>{moment(endWindow).format("HH:mm D MMM")}</td>
+              </tr>
+            </table>
+          </div>
+          <Box mx={1}></Box>
+          <Button
+            onClick={() => {
+              const current = moment(startWindow);
+              const next = current.subtract(frequencyAmount, freqToMoment[frequencyType]);
+              setStartWindow(next.format("YYYY-MM-DD HH:mm:ss"));
+            }}
+            disabled={startWindow <= "2020-04-06 00:00:00"}
+            variant="outlined"
+          >
+            Previous step
+          </Button>
+          <Box mx={1}></Box>
+          <Button
+            onClick={() => {
+              const current = moment(startWindow);
+              const next = current.add(frequencyAmount, freqToMoment[frequencyType]);
+              setStartWindow(next.format("YYYY-MM-DD HH:mm:ss"));
+            }}
+            disabled={startWindow >= "2020-04-10 23:00:00"}
+            variant="outlined"
+          >
+            Next step
+          </Button>
+        </div>
 
         {/* Options for frequency */}
         <BinSizeSelector
@@ -88,7 +145,13 @@ const MainTool: React.FC = () => {
       </div>
 
       {/* Temporary: grid of heatmaps */}
-      <HeatMapView frequencyType={frequencyType} frequencyAmount={frequencyAmount} />
+      <HeatMapView
+        startWindow={startWindow}
+        endWindow={endWindow}
+        setStartWindow={setStartWindow}
+        frequencyType={frequencyType}
+        frequencyAmount={frequencyAmount}
+      />
     </div>
   );
 };

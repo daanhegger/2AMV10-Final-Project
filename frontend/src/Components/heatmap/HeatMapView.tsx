@@ -1,19 +1,20 @@
-import { Grid } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import useAxios from "axios-hooks";
 import React, { useContext, useState } from "react";
 import HeatMapCity from "./HeatMapCity";
 import { AppContext } from "../../context/topicsContext";
 import moment from "moment";
+import { freqToMoment } from "../MainTool";
 
 interface Props {
   frequencyType: string;
   frequencyAmount: number;
+  startWindow: string;
+  endWindow: string;
+  setStartWindow(startWindow: string): void;
 }
 
-// Convert time units from pd.Grouper to moment
-const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
-
-const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount }) => {
+const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWindow, endWindow, setStartWindow }) => {
   const { topics } = useContext(AppContext);
   const [{ data, error, loading }] = useAxios({
     url: "http://localhost:5000/heatmap",
@@ -22,9 +23,6 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount }) => {
     data: topics,
   });
   const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string | undefined>(undefined);
-
-  const [timestamp, setTimestamp] = useState("2020-04-06 03:00:00");
-  const timestampBinsize = moment(timestamp).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss");
 
   if (loading) return <p>Loading data for heatmaps...</p>;
   if (error) return <p>Error fetching data for heatmaps...</p>;
@@ -37,18 +35,6 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount }) => {
 
   return (
     <div>
-      <div>
-        <div>{timestamp}</div>
-        <button
-          onClick={() => {
-            const current = moment(timestamp);
-            const next = current.add(frequencyAmount, freqToMoment[frequencyType]);
-            setTimestamp(next.format("YYYY-MM-DD HH:mm:ss"));
-          }}
-        >
-          Next hour
-        </button>
-      </div>
       <Grid container>
         {dataSorted.map((topicKey) => {
           const topicData = data[topicKey];
@@ -60,7 +46,7 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount }) => {
           );
 
           // Filter relevant rows for the selected timeframe
-          const relevantDataForTime = topicData.filter((row: any) => row.time >= timestamp && row.time < timestampBinsize);
+          const relevantDataForTime = topicData.filter((row: any) => row.time >= startWindow && row.time < endWindow);
           const dataForHeatmap = relevantDataForTime.map((row: any) => ({ neighbourhood: row.location, messages: row.count }));
 
           // Find topic color
@@ -69,6 +55,7 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount }) => {
 
           return (
             <Grid item md={6} key={topicKey}>
+              <h4>Topic: {topicKey}</h4>
               <HeatMapCity
                 data={dataForHeatmap}
                 maxFrequency={maxTopicMessages}

@@ -19,9 +19,6 @@ const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor, onSelect, selecte
   const selector = "svg#" + svgId;
 
   useEffect(() => {
-    console.log("useEffect triggered with " + maxFrequency);
-    console.log(maxFrequency, data);
-
     const handleClick = (e: any) => {
       const neighbourhood = e.path[0].getAttribute("data-nh");
       onSelect(neighbourhood);
@@ -36,14 +33,12 @@ const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor, onSelect, selecte
         return minOpacity;
       }
       const opacity = (dataRow.messages / maxFrequency) * (1 - minOpacity);
-      console.log("getOpacity", data, opacity);
+
       return Math.max(opacity + minOpacity, minOpacity);
     };
 
     const getAmountLabel = (nh: string) => {
-      // console.log("Text update for nh " + nh);
       const dataRow = data.find((row) => row.neighbourhood === nh);
-      console.log(dataRow, data);
       return `(${dataRow?.messages || "0"} tweets)`;
     };
 
@@ -100,9 +95,7 @@ const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor, onSelect, selecte
       .enter()
       .append("svg:text")
       .text(function (neighbourhoodFeature: any) {
-        console.log("RENDERING THE TEXT");
         const targetRow = data.find((row) => row.neighbourhood === neighbourhoodFeature.properties.Nbrhood);
-        console.log(targetRow, data);
         return `(${targetRow?.messages || "0"} tweets)`;
       })
       .attr("x", function (neighbourhoodFeature: any) {
