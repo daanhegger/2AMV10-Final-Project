@@ -16,6 +16,10 @@ const MainTool: React.FC = () => {
   const defaultValues = { amount: 1, unit: "H" };
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
+  // selected on stacked plot date
+  const [hour, setHour] = useState<string>('')
+  const [location, selectLocation] = useState<string>('')
+
   const [interval, setInterval] = useState<Interval>({
     start: defaultView.startDate + " " + defaultView.startTime,
     end: defaultView.endDate + " " + defaultView.endTime,
@@ -61,7 +65,7 @@ const MainTool: React.FC = () => {
       </Box>
 
       {/* Stacked plot for investigation into topics */}
-      <StackedPlot frequencyType={frequencyType} frequencyAmount={frequencyAmount} start={interval.start} end={interval.end}/>
+      <StackedPlot frequencyType={frequencyType} frequencyAmount={frequencyAmount} start={interval.start} end={interval.end} setInterval={(data: string) => setHour(data)} location={location}/>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" margin="50px 0 30px">
         <h3 style={{ margin: 0 }}>Compare popularity of topics per region</h3>

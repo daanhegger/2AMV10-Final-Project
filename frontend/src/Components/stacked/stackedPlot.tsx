@@ -1,10 +1,9 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
-import {TextField} from "@material-ui/core";
-import {Autocomplete} from "@material-ui/lab";
 import {Interval} from "../../models";
+import moment from "moment";
 
 /**
  * Map Flask object response to coordinate-array
@@ -15,6 +14,8 @@ interface Props {
   interval?: Interval;
   start: string;
   end: string;
+  setInterval(data: string) : void;
+  location: string;
 }
 
 type Coord = { x: number | Date | string; y: number};
@@ -49,33 +50,12 @@ const transformDataset = (datasets: any[]) => {
 
   return data
 }
-
-const locationList = [
-  'Broadview',
-  'Chapparal',
-  'Cheddarford',
-  'Downtown',
-  'East Parton',
-  'Easton',
-  'Northwest',
-  'Oak Willow',
-  'Old Town',
-  'Palace Hills',
-  'Pepper Mill',
-  'Safe Town',
-  'Scenic Vista',
-  'Southton',
-  'Southwest',
-  'Terrapin Springs',
-  'West Parton',
-  'Weston',
-  'Undefined'
-]
+const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 /**
  * Plot frequency of messages over time
  */
-const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end }) => {
+const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end, interval, setInterval , location}) => {
   const { topics } = useContext(AppContext);
 
   const [datasets, setDatasets] = useState<any []>([]);
@@ -83,7 +63,9 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [location, selectLocation] = useState('')
+  const [selected, setSelected] = useState( interval || {start: '0', end: '0'})
+
+  const [shapes, setShapes] = useState(datasets.map((dataset, index: number) => ({ type: 'line', xref: 'x', yref: `y${index + 1}`, x0: selected.start, y0: 0, x1: selected.start, y1: Math.max.apply(Math, dataset.y), fillcolor: '#FA8072', opacity: 0.2, line: {width: 0}})))
 
   /**
    * Every time parameters change, reload all datasets
@@ -128,6 +110,28 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
     fetchData();
   }, [topics, frequencyType, frequencyAmount, location]);
 
+  useEffect(() => (
+    setShapes(datasets.map((dataset, index: number) => ({
+                        type: 'rect',
+                        xref: 'x',
+                        yref: `y${index + 1}`,
+                        x0: selected.start,
+                        y0: 0,
+                        x1: selected.end,
+                        y1: Math.max.apply(Math, dataset.y),
+                        fillcolor: '#FA8072',
+                        opacity: 0.2,
+                        line: {
+                            width: 0
+                        }
+                      })))
+  ), [selected])
+
+  const selectedDate = useCallback((event: any) => {
+    setSelected({start: event.points[0].x, end: moment(event.points[0].x).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss")})
+    setInterval(event.points[0].x);
+  }, [])
+
   /**
    * Network handlers
    */
@@ -136,27 +140,14 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
   const setSubPlots = datasets.map((_, index: number) => `xy${index}`)
 
-  // var plot = document.getElementById("stacked-plots")
-  // plot.on( 'plotly_hover',function (eventdata: any){
-  //       if(eventdata.yvals)
-  //       {
-  //         console.log(eventdata.yvals);
-  //           Plot.Fx.hover(plot, {yval:eventdata.xyvals[0] }, setSubPlots);
-  //       }
-  //   })
-
   return (
     <div>
-      <Autocomplete
-          value={location}
-          onChange={(_, newValue) => (selectLocation(newValue || ''))}
-          options={locationList}
-          renderInput={(params) => <TextField {...params} label="Filter on location" variant="outlined" />}
-      />
         <Plot id="stacked-plots"
-        data={datasets}
-        layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length,
-          xaxis: { range: [start, end] }} }
+              data={datasets}
+              layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length,
+                      xaxis: { range: [start, end] }, shapes: shapes}
+              }
+              onClick={(event: any) => selectedDate(event)}
       />
     </div>
 
