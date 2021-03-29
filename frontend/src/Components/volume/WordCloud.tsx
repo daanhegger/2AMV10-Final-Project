@@ -1,5 +1,5 @@
 import useAxios from "axios-hooks";
-import React from "react";
+import React, { useEffect } from "react";
 import ReactWordcloud, { Callbacks, Optional, Options, Word } from "react-wordcloud";
 import { Skeleton } from "@material-ui/lab";
 
@@ -16,18 +16,28 @@ const options: Optional<Options> = {
   fontSizes: [5, 65],
   fontStyle: "normal",
   fontWeight: "normal",
+
+  deterministic: true,
 };
 
 interface Props {
   start: string;
   end: string;
+  onLoading(state: boolean): void;
 }
 
 /**
  * Show a wordcloud of words in a certain interval
  */
-const WordCloud: React.FC<Props> = ({ start, end }) => {
+const WordCloud: React.FC<Props> = ({ start, end, onLoading }) => {
   const [{ data, loading, error }] = useAxios({ url: "http://localhost:5000/word-frequency", params: { start_interval: start, end_interval: end } });
+
+  /**
+   * Update parent of loading statee
+   */
+  useEffect(() => {
+    onLoading(loading);
+  }, [loading, onLoading]);
 
   // Network handling
   if (loading) return <Skeleton animation="wave" height={300} />;

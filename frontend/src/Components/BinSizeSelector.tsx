@@ -40,7 +40,6 @@ const BinSizeSelector: React.FC<Props> = ({ onChange, defaultValues }) => {
         <Select value={frequencyType} onChange={(e) => setFrequencyType(e.target.value as string)} variant="outlined" label="Unit">
           <MenuItem value="min">Minute(s)</MenuItem>
           <MenuItem value="H">Hour(s)</MenuItem>
-          <MenuItem value="S">Second(s)</MenuItem>
         </Select>
       </FormControl>
 
