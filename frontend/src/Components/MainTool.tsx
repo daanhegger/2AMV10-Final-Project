@@ -22,12 +22,14 @@ const MainTool: React.FC = () => {
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
   // selected on stacked plot date
   const [hour, setHour] = useState<string>("");
-  const [location, selectLocation] = useState<string>("");
 
   const [interval, setInterval] = useState<Interval>({
     start: defaultView.startDate + " " + defaultView.startTime,
     end: defaultView.endDate + " " + defaultView.endTime,
   });
+
+  // Highlighted region in map
+  const [region, setRegion] = useState<string | null>(null);
 
   /**
    * Start and end state for stackedPlot + Heatmap
@@ -74,6 +76,8 @@ const MainTool: React.FC = () => {
         <p style={{ margin: 0 }}>Manage your topics using the sidebar on the right</p>
       </Box>
 
+      {region ? <p>Filtered on region: {region}</p> : <p>Showing summed aggregation over all regions</p>}
+
       {/* Stacked plot for investigation into topics */}
       <StackedPlot
         frequencyType={frequencyType}
@@ -81,7 +85,7 @@ const MainTool: React.FC = () => {
         start={interval.start}
         end={interval.end}
         setInterval={(data: string) => setHour(data)}
-        location={location}
+        location={region || ""}
         startWindow={startWindow}
         endWindow={endWindow}
         setStartWindow={setStartWindow}
@@ -132,6 +136,10 @@ const MainTool: React.FC = () => {
           >
             Next step
           </Button>
+
+          <Box mx={1}></Box>
+
+          <Button onClick={() => setRegion(null)}>Deselect Region</Button>
         </div>
 
         {/* Options for frequency */}
@@ -144,6 +152,8 @@ const MainTool: React.FC = () => {
         />
       </div>
 
+      <Box my={1}></Box>
+
       {/* Temporary: grid of heatmaps */}
       <HeatMapView
         startWindow={startWindow}
@@ -151,6 +161,8 @@ const MainTool: React.FC = () => {
         setStartWindow={setStartWindow}
         frequencyType={frequencyType}
         frequencyAmount={frequencyAmount}
+        selectedRegion={region}
+        setRegion={setRegion}
       />
     </div>
   );

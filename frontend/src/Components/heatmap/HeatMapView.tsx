@@ -12,9 +12,11 @@ interface Props {
   startWindow: string;
   endWindow: string;
   setStartWindow(startWindow: string): void;
+  selectedRegion: string | null;
+  setRegion(region: string | null): void;
 }
 
-const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWindow, endWindow, setStartWindow }) => {
+const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWindow, endWindow, selectedRegion, setRegion }) => {
   const { topics } = useContext(AppContext);
   const [{ data, error, loading }] = useAxios({
     url: "http://localhost:5000/heatmap",
@@ -22,7 +24,6 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWin
     method: "POST",
     data: topics,
   });
-  const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string | undefined>(undefined);
 
   if (loading) return <p>Loading data for heatmaps...</p>;
   if (error) return <p>Error fetching data for heatmaps...</p>;
@@ -56,13 +57,7 @@ const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWin
           return (
             <Grid item md={6} key={topicKey}>
               <h4>Topic: {topicKey}</h4>
-              <HeatMapCity
-                data={dataForHeatmap}
-                maxFrequency={maxTopicMessages}
-                baseColor={color}
-                onSelect={(nh) => setSelectedNeighbourhood(nh)}
-                selectedNH={selectedNeighbourhood}
-              />
+              <HeatMapCity data={dataForHeatmap} maxFrequency={maxTopicMessages} baseColor={color} onSelect={setRegion} selectedNH={selectedRegion} />
             </Grid>
           );
         })}

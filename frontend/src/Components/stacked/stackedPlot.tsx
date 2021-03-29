@@ -93,8 +93,6 @@ const StakedPlot: React.FC<Props> = ({
         }))
       : [];
 
-  console.log(shapes);
-
   /**
    * Every time parameters change, reload all datasets
    */
@@ -113,8 +111,6 @@ const StakedPlot: React.FC<Props> = ({
             })
           )
         );
-
-        console.log(responses);
 
         var data: any[] = [];
 

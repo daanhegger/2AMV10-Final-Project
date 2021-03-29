@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import * as d3 from "d3";
 import geojson from "../../data/cityMap.json";
 import { GeoPermissibleObjects } from "d3";
@@ -10,8 +10,8 @@ interface Props {
   baseColor: string;
   data: { neighbourhood: string; messages: number }[];
   maxFrequency: number;
-  onSelect(neighbourhood: string): void;
-  selectedNH?: string;
+  onSelect(neighbourhood: string | null): void;
+  selectedNH: string | null;
 }
 
 const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor, onSelect, selectedNH, data, maxFrequency }) => {
@@ -142,6 +142,8 @@ const HeatMapCity: React.FC<Props> = ({ size = 600, baseColor, onSelect, selecte
           .select(`.${classNameSafe(selectedNH)}`)
           .style("stroke-width", "3")
           .style("stroke", "yellow");
+      } else {
+        d3.select(selector).selectAll(`.nhpath`).style("stroke-width", "0.7").style("stroke", "black");
       }
 
       /**
