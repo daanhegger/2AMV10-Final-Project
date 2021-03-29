@@ -119,15 +119,19 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
     onCloseDialog();
   };
 
+  /**
+   * If true, disable button
+   */
   const validToSave = () => {
-    return topics.map(topic => {
-      console.log(topic.terms.length)
-      if (topic.terms.length === 0) {
-        return true;
-      } else {
-        return false;
-      }
-    }).find(Boolean);
+    // Reject saving if there is at least one topic with no terns
+    const topicHasNoTerms = topics.map((topic) => topic.terms.length === 0).find(Boolean);
+
+    // Reject saving is term is in two topics
+    const allTerms = topics.flatMap((t) => t.terms);
+    const topicsPerTerm = allTerms.map((term) => topics.filter((t) => t.terms.includes(term)).length);
+    const topicsPerTermValidate = topicsPerTerm.find((tpt) => tpt > 1);
+
+    return topicHasNoTerms || Boolean(topicsPerTermValidate);
   };
 
   return (
@@ -196,11 +200,12 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
 
       {/* Bottom part: save the topics */}
       <DialogActions style={{ borderTop: "1px solid #c7c7c7" }}>
+        {validToSave() ? <Alert severity="warning">One of the topics has no terms yet or a term is used in multiple topics</Alert> : null}
+
         <Button variant="text" onClick={() => onCloseDialog()}>
           Cancel
         </Button>
 
-        { validToSave() ? <Alert severity="warning">One of the topics has no terms yet</Alert> : null}
         <Button variant="contained" disabled={validToSave()} color="primary" onClick={handleSave}>
           Save &amp; close
         </Button>
