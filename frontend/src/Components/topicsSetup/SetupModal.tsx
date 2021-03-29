@@ -124,6 +124,17 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
     onCloseDialog();
   };
 
+  const validToSave = () => {
+    return topics.map(topic => {
+      console.log(topic.terms.length)
+      if (topic.terms.length === 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }).find(Boolean);
+  };
+
   return (
     <Dialog open={dialogOpened} onClose={onCloseDialog} fullWidth maxWidth="lg" disableBackdropClick classes={{ paper: classes.dialog }}>
       {/* Top part: title */}
@@ -188,7 +199,9 @@ const SetupModal: React.FC<Props> = ({ onCloseDialog, dialogOpened, globalTopics
         <Button variant="text" onClick={() => onCloseDialog()}>
           Cancel
         </Button>
-        <Button variant="contained" color="primary" onClick={handleSave}>
+
+        { validToSave() ? <Alert severity="warning">One of the topics has no terms yet</Alert> : null}
+        <Button variant="contained" disabled={validToSave()} color="primary" onClick={handleSave}>
           Save &amp; close
         </Button>
       </DialogActions>
