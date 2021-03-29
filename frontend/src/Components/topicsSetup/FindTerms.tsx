@@ -8,6 +8,7 @@ import { similarTermParser } from "../../utils/parsers";
 import { Scatter } from "react-chartjs-2";
 import { numberToColorHsl } from "../../utils/colors";
 import useAxios from "axios-hooks";
+import { ChartDataSets } from "chart.js";
 
 interface Props {
   addTerm(term: string): void;
@@ -23,6 +24,7 @@ const FindTerms: React.FC<Props> = ({ addTerm, alreadyAddedTerms }) => {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<TermSuggestion[]>([]);
   const { enqueueSnackbar } = useSnackbar();
+  const [hoveredIndex, setHoveredIndex] = useState<number | undefined>(undefined);
 
   // Request all words in the dataset
   const [word2vecAxios] = useAxios("http://localhost:5000/word2vec");
@@ -84,7 +86,7 @@ const FindTerms: React.FC<Props> = ({ addTerm, alreadyAddedTerms }) => {
           {suggestions.map((termSuggestion, i) => {
             const alreadyChosen = alreadyAddedTerms.includes(termSuggestion.term);
             return (
-              <ListItem key={i} button onClick={() => addTerm(termSuggestion.term)} disabled={alreadyChosen}>
+              <ListItem key={i} button onClick={() => addTerm(termSuggestion.term)} disabled={alreadyChosen} onMouseEnter={() => setHoveredIndex(i)}>
                 <div>
                   {/* Show the term and score in the list */}
                   {/* Strike-through if already selected */}
@@ -115,7 +117,7 @@ const FindTerms: React.FC<Props> = ({ addTerm, alreadyAddedTerms }) => {
       </div>
 
       {/* Scatter plot for term vectors */}
-      <ScatterPlotTerms points={suggestions} />
+      <ScatterPlotTerms points={suggestions} hoveredIndex={hoveredIndex} />
     </div>
   );
 };
@@ -124,16 +126,48 @@ export default FindTerms;
 
 interface ScatterPlotTermsProps {
   points: TermSuggestion[];
+  hoveredIndex?: number;
 }
 
 /**
  * Display vectorized terms in a scatter plot
  */
-const ScatterPlotTerms: React.FC<ScatterPlotTermsProps> = ({ points }) => {
+const ScatterPlotTerms: React.FC<ScatterPlotTermsProps> = ({ points, hoveredIndex }) => {
   const dataset: Chart.ChartDataSets = {
     label: "Terms in 2D space",
-    data: points.map((p) => ({ x: p.vector.x, y: p.vector.y })),
+    data: points.map((p) => ({ x: p.vector.x, y: p.vector.y, label: p.term })),
+    pointBackgroundColor: (ctx) => {
+      if (ctx.dataIndex !== undefined) {
+        if (ctx.dataIndex === hoveredIndex) {
+          return "rgb(0, 0, 255)";
+        }
+
+        const p = points[ctx.dataIndex];
+
+        if (p) {
+          return numberToColorHsl(p.score * 100);
+        }
+      }
+      return "rgb(20, 20, 20)";
+    },
   };
 
-  return <Scatter data={{ datasets: [dataset] }}></Scatter>;
+  return (
+    <Scatter
+      options={{
+        tooltips: {
+          callbacks: {
+            label: function (tooltipItem: { datasetIndex: number; index: number }, data) {
+              const ds = data.datasets as ChartDataSets[];
+              const datapoints = ds[tooltipItem.datasetIndex].data as any[];
+              const label = datapoints[tooltipItem.index].label || "";
+
+              return label;
+            },
+          },
+        },
+      }}
+      data={{ datasets: [dataset], labels: points.map((p) => p.term) }}
+    ></Scatter>
+  );
 };
