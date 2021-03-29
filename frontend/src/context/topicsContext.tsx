@@ -8,13 +8,6 @@ interface AppContextProps {
 
   topicManagerOpened: boolean;
   setTopicManagerOpened(state: boolean): void;
-
-  frequencyType: string;
-  setFrequencyType(frequency: string): void;
-
-  frequencyAmount: number;
-  setFrequencyAmount(amount: number): void;
-
 }
 
 // Create an initial context
@@ -25,11 +18,8 @@ export const AppContext = createContext<AppContextProps>({} as AppContextProps);
  * Default values and state storage
  */
 export const AppProvider: React.FC = ({ children }) => {
-  const defaultValues = { amount: 1, unit: "H" };
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicManagerOpened, setTopicManagerOpened] = useState<boolean>(false);
-  const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
-  const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
 
   // Restore topics from localstorage if present
   useEffect(() => {
@@ -39,7 +29,7 @@ export const AppProvider: React.FC = ({ children }) => {
     }
   }, []);
 
-  const value: AppContextProps = { topics, setTopics, topicManagerOpened, setTopicManagerOpened, frequencyType, setFrequencyType, frequencyAmount, setFrequencyAmount };
+  const value: AppContextProps = { topics, setTopics, topicManagerOpened, setTopicManagerOpened };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
