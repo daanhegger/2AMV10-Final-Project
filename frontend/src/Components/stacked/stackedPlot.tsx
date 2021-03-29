@@ -10,11 +10,11 @@ import moment from "moment";
  */
 type Coord = { x: number | Date | string; y: number };
 
-const dataMapper = (data: any, term: any): Coord[] =>
-  data.map((data_row: any) => ({
+const dataMapper = (data: any, term: any): Coord[] =>{
+  return data.map((data_row: any) => ({
     x: new Date(parseInt(data_row.time)),
     y: data_row[term.title],
-  }));
+  }))};
 const transformDataset = (datasets: any[]) => {
   const data: { name: any; x: any[]; y: any[]; marker: any; xaxis: string; yaxis: string; type: string; hoverinfo: string }[] = [];
   datasets.forEach((dataset: any, index: number) => {
@@ -39,7 +39,6 @@ const transformDataset = (datasets: any[]) => {
 
   return data;
 };
-const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 interface Props {
   frequencyType: string;
@@ -116,8 +115,10 @@ const StakedPlot: React.FC<Props> = ({
 
         if (topics) {
           responses.map((response) =>
-            topics.forEach((topic) => {
-              if (data.filter((data) => data.label === topic.title).length === 0 && response.data[0][topic.title]) {
+              topics.forEach((topic) => {
+                console.log(response.data)
+              if (data.filter((data) => data.label === topic.title).length === 0 && response.data.length > 0 && response.data[0][topic.title]) {
+                console.log('got here')
                 data.push({ label: topic.title, data: dataMapper(response.data, topic), color: topic.color });
               }
             })
@@ -126,6 +127,7 @@ const StakedPlot: React.FC<Props> = ({
 
         setDatasets(transformDataset(data));
       } catch (e) {
+        console.log(e)
         setError(true);
       } finally {
         setLoading(false);
