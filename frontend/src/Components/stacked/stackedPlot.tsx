@@ -2,8 +2,6 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
-import {TextField} from "@material-ui/core";
-import {Autocomplete} from "@material-ui/lab";
 import {Interval} from "../../models";
 
 /**
@@ -16,7 +14,7 @@ interface Props {
   start: string;
   end: string;
   setInterval(data: string) : void;
-  loc: string;
+  location: string;
 }
 
 type Coord = { x: number | Date | string; y: number};
@@ -52,40 +50,16 @@ const transformDataset = (datasets: any[]) => {
   return data
 }
 
-const locationList = [
-  'Broadview',
-  'Chapparal',
-  'Cheddarford',
-  'Downtown',
-  'East Parton',
-  'Easton',
-  'Northwest',
-  'Oak Willow',
-  'Old Town',
-  'Palace Hills',
-  'Pepper Mill',
-  'Safe Town',
-  'Scenic Vista',
-  'Southton',
-  'Southwest',
-  'Terrapin Springs',
-  'West Parton',
-  'Weston',
-  'Undefined'
-]
-
 /**
  * Plot frequency of messages over time
  */
-const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end, interval, setInterval , loc}) => {
+const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, end, interval, setInterval , location}) => {
   const { topics } = useContext(AppContext);
 
   const [datasets, setDatasets] = useState<any []>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
-  const [location, selectLocation] = useState(loc)
 
   const [selected, setSelected] = useState( interval || {start: '0', end: '0'})
 
@@ -165,12 +139,6 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
   return (
     <div>
-      <Autocomplete
-          value={location}
-          onChange={(_, newValue) => (selectLocation(newValue || ''))}
-          options={locationList}
-          renderInput={(params) => <TextField {...params} label="Filter on location" variant="outlined" />}
-      />
         <Plot id="stacked-plots"
               data={datasets}
               layout={{grid: {rows: datasets.length, columns: 1, subplots: setSubPlots}, width: 1230, height: 200 * datasets.length,
