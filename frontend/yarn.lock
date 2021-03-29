@@ -11771,6 +11771,11 @@ react-dev-utils@^11.0.2:
     strip-ansi "6.0.0"
     text-table "0.2.0"
 
+react-disable@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-disable/-/react-disable-0.1.0.tgz#e3474aefcb2b91fcb534693c66b7497fb28b85af"
+  integrity sha512-3RbSYuUtakIy1ulCfDf6yoJAsjHFNLv467bSBwyxkNDyez/z7CbcTZ6QUWCrhfybvfm81IN6QT3pUfDoKcvaFQ==
+
 react-dom@^17.0.1:
   version "17.0.1"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-17.0.1.tgz"

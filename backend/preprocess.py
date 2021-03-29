@@ -16,6 +16,8 @@ def preprocess(df_: pd.DataFrame):
     # Replace nan's (float) to empty strings s.t. text processing works for every row
     df_.message = df_.message.fillna('')
 
+    df_["message_tokenized"] = df_.message.map(lambda x: x.lower())
+
 
 def init_df(dataset_path):
     """Load data into memory, usable by rest of the app"""

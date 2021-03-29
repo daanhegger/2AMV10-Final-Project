@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import VolumePlot from "./volume/VolumePlot";
 import StackedPlot from "./stacked/stackedPlot";
-import HeatMapCity from "./heatmap/HeatMapCity";
-import { Box, Grid } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import DateFilter, { defaultView } from "./DateFilter";
 import BinSizeSelector from "./BinSizeSelector";
 import { Interval } from "../models";
+import HeatMapView from "./heatmap/HeatMapView";
+import moment from "moment";
+
+// Convert time units from pd.Grouper to moment
+export const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 /**
  * Main part of the tool where all connected interactive visualizations
@@ -16,10 +20,22 @@ const MainTool: React.FC = () => {
   const defaultValues = { amount: 1, unit: "H" };
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
   const [frequencyAmount, setFrequencyAmount] = useState<number>(defaultValues.amount);
+  // selected on stacked plot date
+  const [hour, setHour] = useState<string>("");
+
   const [interval, setInterval] = useState<Interval>({
     start: defaultView.startDate + " " + defaultView.startTime,
     end: defaultView.endDate + " " + defaultView.endTime,
   });
+
+  // Highlighted region in map
+  const [region, setRegion] = useState<string | null>(null);
+
+  /**
+   * Start and end state for stackedPlot + Heatmap
+   */
+  const [startWindow, setStartWindow] = useState("2020-04-06 00:00:00");
+  const endWindow = moment(startWindow).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss");
 
   return (
     <div>
@@ -60,31 +76,94 @@ const MainTool: React.FC = () => {
         <p style={{ margin: 0 }}>Manage your topics using the sidebar on the right</p>
       </Box>
 
+      {region ? <p>Filtered on region: {region}</p> : <p>Showing summed aggregation over all regions</p>}
+
       {/* Stacked plot for investigation into topics */}
-      <StackedPlot frequencyType={frequencyType} frequencyAmount={frequencyAmount} start={interval.start} end={interval.end}/>
+      <StackedPlot
+        frequencyType={frequencyType}
+        frequencyAmount={frequencyAmount}
+        start={interval.start}
+        end={interval.end}
+        setInterval={(data: string) => setHour(data)}
+        location={region || ""}
+        startWindow={startWindow}
+        endWindow={endWindow}
+        setStartWindow={setStartWindow}
+      />
 
       <Box display="flex" justifyContent="space-between" alignItems="center" margin="50px 0 30px">
         <h3 style={{ margin: 0 }}>Compare popularity of topics per region</h3>
         <p style={{ margin: 0 }}>Use the time-tools to manage your sliding window</p>
       </Box>
 
-      {/* Temporary: grid of heatmaps */}
-      <div>
-        <Grid container>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="#7591ff" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="red" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="green" />
-          </Grid>
-          <Grid item md={6}>
-            <HeatMapCity baseColor="yellow" />
-          </Grid>
-        </Grid>
+      {/* Plot settings */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Edit window  */}
+        <div style={{ display: "flex" }}>
+          <div>
+            <table>
+              <tr>
+                <td>Start</td>
+                <td>{moment(startWindow).format("HH:mm D MMM")}</td>
+              </tr>
+              <tr>
+                <td>End</td>
+                <td>{moment(endWindow).format("HH:mm D MMM")}</td>
+              </tr>
+            </table>
+          </div>
+          <Box mx={1}></Box>
+          <Button
+            onClick={() => {
+              const current = moment(startWindow);
+              const next = current.subtract(frequencyAmount, freqToMoment[frequencyType]);
+              setStartWindow(next.format("YYYY-MM-DD HH:mm:ss"));
+            }}
+            disabled={startWindow <= "2020-04-06 00:00:00"}
+            variant="outlined"
+          >
+            Previous step
+          </Button>
+          <Box mx={1}></Box>
+          <Button
+            onClick={() => {
+              const current = moment(startWindow);
+              const next = current.add(frequencyAmount, freqToMoment[frequencyType]);
+              setStartWindow(next.format("YYYY-MM-DD HH:mm:ss"));
+            }}
+            disabled={startWindow >= "2020-04-10 23:00:00"}
+            variant="outlined"
+          >
+            Next step
+          </Button>
+
+          <Box mx={1}></Box>
+
+          <Button onClick={() => setRegion(null)}>Deselect Region</Button>
+        </div>
+
+        {/* Options for frequency */}
+        <BinSizeSelector
+          onChange={(amount, type) => {
+            setFrequencyType(type);
+            setFrequencyAmount(amount);
+          }}
+          defaultValues={defaultValues}
+        />
       </div>
+
+      <Box my={1}></Box>
+
+      {/* Temporary: grid of heatmaps */}
+      <HeatMapView
+        startWindow={startWindow}
+        endWindow={endWindow}
+        setStartWindow={setStartWindow}
+        frequencyType={frequencyType}
+        frequencyAmount={frequencyAmount}
+        selectedRegion={region}
+        setRegion={setRegion}
+      />
     </div>
   );
 };
