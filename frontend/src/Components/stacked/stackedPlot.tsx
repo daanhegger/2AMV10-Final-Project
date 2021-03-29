@@ -3,6 +3,7 @@ import axios from "axios";
 import Plot from 'react-plotly.js';
 import {AppContext} from "../../context/topicsContext";
 import {Interval} from "../../models";
+import moment from "moment";
 
 /**
  * Map Flask object response to coordinate-array
@@ -49,6 +50,7 @@ const transformDataset = (datasets: any[]) => {
 
   return data
 }
+const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
 
 /**
  * Plot frequency of messages over time
@@ -63,7 +65,7 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
   const [selected, setSelected] = useState( interval || {start: '0', end: '0'})
 
-  const [shapes, setShapes] = useState(datasets.map((dataset, index: number) => ({ type: 'line', xref: 'x', yref: `y${index + 1}`, x0: selected.start, y0: 0, x1: selected.start, y1: Math.max.apply(Math, dataset.y), line: {color: 'rgb(55, 128, 191)', width: 3}})))
+  const [shapes, setShapes] = useState(datasets.map((dataset, index: number) => ({ type: 'line', xref: 'x', yref: `y${index + 1}`, x0: selected.start, y0: 0, x1: selected.start, y1: Math.max.apply(Math, dataset.y), fillcolor: '#FA8072', opacity: 0.2, line: {width: 0}})))
 
   /**
    * Every time parameters change, reload all datasets
@@ -110,22 +112,23 @@ const StakedPlot: React.FC<Props> = ({ frequencyType, frequencyAmount, start, en
 
   useEffect(() => (
     setShapes(datasets.map((dataset, index: number) => ({
-                        type: 'line',
+                        type: 'rect',
                         xref: 'x',
                         yref: `y${index + 1}`,
                         x0: selected.start,
                         y0: 0,
-                        x1: selected.start,
+                        x1: selected.end,
                         y1: Math.max.apply(Math, dataset.y),
+                        fillcolor: '#FA8072',
+                        opacity: 0.2,
                         line: {
-                          color: 'rgb(55, 128, 191)',
-                          width: 3
+                            width: 0
                         }
                       })))
   ), [selected])
 
   const selectedDate = useCallback((event: any) => {
-    setSelected({start: event.points[0].x, end: event.points[0].x})
+    setSelected({start: event.points[0].x, end: moment(event.points[0].x).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss")})
     setInterval(event.points[0].x);
   }, [])
 
