@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { Topic } from "../models";
+import { DatasetFilter, Topic } from "../models";
 
 // Define the shape of the application global state
 interface AppContextProps {
@@ -8,6 +8,9 @@ interface AppContextProps {
 
   topicManagerOpened: boolean;
   setTopicManagerOpened(state: boolean): void;
+
+  datasetFilter?: DatasetFilter;
+  setDatasetFilter(datasetFilter?: DatasetFilter): void;
 }
 
 // Create an initial context
@@ -20,6 +23,7 @@ export const AppContext = createContext<AppContextProps>({} as AppContextProps);
 export const AppProvider: React.FC = ({ children }) => {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicManagerOpened, setTopicManagerOpened] = useState<boolean>(false);
+  const [datasetFilter, setDatasetFilter] = useState<DatasetFilter | undefined>(undefined);
 
   // Restore topics from localstorage if present
   useEffect(() => {
@@ -29,7 +33,7 @@ export const AppProvider: React.FC = ({ children }) => {
     }
   }, []);
 
-  const value: AppContextProps = { topics, setTopics, topicManagerOpened, setTopicManagerOpened };
+  const value: AppContextProps = { topics, setTopics, topicManagerOpened, setTopicManagerOpened, datasetFilter, setDatasetFilter };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

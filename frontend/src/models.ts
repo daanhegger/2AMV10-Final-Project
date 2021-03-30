@@ -3,6 +3,8 @@ export interface Tweet {
   location: string;
   account: string;
   message: string;
+  topics: Topic[];
+  time_raw: string;
 }
 
 export interface Topic {
@@ -25,4 +27,10 @@ export interface Coord {
 export interface Interval {
   start: string;
   end: string;
+}
+
+export interface DatasetFilter {
+  start: string;
+  end: string;
+  location?: string;
 }

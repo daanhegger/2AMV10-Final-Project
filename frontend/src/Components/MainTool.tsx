@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import VolumePlot from "./volume/VolumePlot";
 import StackedPlot from "./stacked/stackedPlot";
 import { Box, Button } from "@material-ui/core";
@@ -7,6 +7,7 @@ import BinSizeSelector from "./BinSizeSelector";
 import { Interval } from "../models";
 import HeatMapView from "./heatmap/HeatMapView";
 import moment from "moment";
+import { AppContext } from "../context/topicsContext";
 
 // Convert time units from pd.Grouper to moment
 export const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", min: "minutes" };
@@ -16,6 +17,8 @@ export const freqToMoment: Record<string, "hours" | "minutes"> = { H: "hours", m
  * are vertically aligned
  */
 const MainTool: React.FC = () => {
+  const { setDatasetFilter } = useContext(AppContext);
+
   // Timeframe & Binsize settings
   const defaultValues = { amount: 1, unit: "H" };
   const [frequencyType, setFrequencyType] = useState<string>(defaultValues.unit);
@@ -36,6 +39,14 @@ const MainTool: React.FC = () => {
    */
   const [startWindow, setStartWindow] = useState("2020-04-06 00:00:00");
   const endWindow = moment(startWindow).add(frequencyAmount, freqToMoment[frequencyType]).format("YYYY-MM-DD HH:mm:ss");
+
+  useEffect(() => {
+    setDatasetFilter({
+      location: region || undefined,
+      start: startWindow,
+      end: endWindow,
+    });
+  }, [endWindow, region, setDatasetFilter, startWindow]);
 
   return (
     <div>

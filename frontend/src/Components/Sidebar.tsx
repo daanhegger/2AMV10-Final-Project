@@ -3,6 +3,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import TweetListContainer from "./tweets/TweetListContainer";
 import TopicListContainer from "./topics/TopicListContainer";
+import { Paper } from "@material-ui/core";
 
 /**
  * Content the sidebar (drawer)
@@ -18,10 +19,12 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* Bar with the tab buttons */}
-      <Tabs value={value} onChange={handleChange} variant="fullWidth" indicatorColor="primary">
-        <Tab label="Topics" />
-        <Tab label="Tweets" />
-      </Tabs>
+      <Paper square>
+        <Tabs value={value} onChange={handleChange} variant="fullWidth" indicatorColor="primary">
+          <Tab label="Topics" />
+          <Tab label="Tweets" />
+        </Tabs>
+      </Paper>
 
       {/* Defining the views, conditional rendering based on the currently active tab */}
       {/* 0: Topic view */}

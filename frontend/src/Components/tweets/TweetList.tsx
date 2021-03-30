@@ -8,7 +8,7 @@ import TweetView from "./TweetView";
  * Helper component for ReactWindow
  */
 const Row = React.memo(({ index, style, data: tweets }: ListChildComponentProps) => (
-  <ListItem style={style}>
+  <ListItem style={style} dense>
     <TweetView tweet={tweets[index]} />
   </ListItem>
 ));
@@ -28,7 +28,7 @@ const TweetList: React.FC<Props> = ({ tweets }) => {
 
   return (
     <>
-      <p>Showing {tweets.length} tweets:</p>
+      <p style={{ padding: "0 8px" }}>Showing {tweets.length} tweets:</p>
       <List height={750} itemCount={tweets.length} itemSize={100} width={"100%"} itemData={tweets}>
         {Row}
       </List>
