@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel } from "@material-ui/core";
+import { Box, Checkbox, FormControlLabel } from "@material-ui/core";
 import useAxios from "axios-hooks";
 import moment from "moment";
 import React, { useContext, useState } from "react";
@@ -61,24 +61,26 @@ const TweetListContainer: React.FC = () => {
     <div>
       <div style={{ padding: 6 }}>
         {datasetFilter && (
-          <div>
-            <p>Filters applied:</p>
-            <table>
+          <div style={{ display: "flex" }}>
+            <div style={{ marginRight: 20 }}>Filters applied:</div>
+            <table style={{ borderCollapse: "collapse" }}>
               <tr>
-                <td>Start</td>
+                <td>From:</td>
                 <td>{moment(datasetFilter.start).format("HH:mm D MMM")}</td>
               </tr>
               <tr>
-                <td>End</td>
+                <td>To:</td>
                 <td>{moment(datasetFilter.end).format("HH:mm D MMM")}</td>
               </tr>
               <tr>
-                <td>Location</td>
+                <td>Location:</td>
                 <td>{datasetFilter.location || "Any location"}</td>
               </tr>
             </table>
           </div>
         )}
+
+        <Box my={1} />
 
         {/* Checkbox to toggle filtering tweets */}
         <FormControlLabel

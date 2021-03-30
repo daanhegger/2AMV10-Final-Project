@@ -1,6 +1,7 @@
 import { Tweet } from "../../models";
 import truncate from "../../utils/truncate";
 import { Tooltip } from "@material-ui/core";
+import moment from "moment";
 
 interface Props {
   tweet: Tweet;
@@ -11,7 +12,7 @@ interface Props {
  */
 const TweetView: React.FC<Props> = ({ tweet }) => {
   // user-friendly date, create from Date (from epoch-time)
-  const date = shortDateSting(new Date(tweet.time));
+  const date = moment(tweet.time_raw).format("HH:mm D MMM");
 
   const hasTopic = tweet.topics.length > 0;
 
@@ -19,9 +20,12 @@ const TweetView: React.FC<Props> = ({ tweet }) => {
 
   return (
     <Tooltip title={`Topic(s): ${tweet.topics.map((t) => t.title).join(", ")}`} disableHoverListener={!hasTopic} placement={"left"}>
-      <div style={{ width: "100%", display: "flex" }}>
-        <div style={{ width: 8, minWidth: 8, height: 80, marginRight: 10, borderRadius: 4, backgroundColor: color, flexBasis: 8 }}></div>
-        <div>
+      <div style={{ minHeight: 80, width: "100%", display: "flex", alignItems: "stretch" }}>
+        {/* Color indicator */}
+        <div style={{ width: 8, minWidth: 8, marginRight: 10, borderRadius: 4, backgroundColor: color, flexBasis: 8 }}></div>
+
+        {/* Tweet display */}
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           {/* Content of the tweet */}
           <div>{truncate(tweet.message, 140)}</div>
 
@@ -38,19 +42,3 @@ const TweetView: React.FC<Props> = ({ tweet }) => {
 };
 
 export default TweetView;
-
-/**
- * Convert the date into a short user friendly string
- */
-const shortDateSting = (date: Date): string => {
-  const hour = new Intl.DateTimeFormat("nl", { hour: "2-digit" }).format(date);
-
-  // Minutes don't have leading zeroes :(
-  let minutes: string | number = date.getMinutes();
-  if (minutes < 9) minutes = "0" + minutes;
-
-  const day = new Intl.DateTimeFormat("en", { day: "numeric" }).format(date);
-  const month = new Intl.DateTimeFormat("en", { month: "short" }).format(date);
-
-  return `${hour}:${minutes} ${day} ${month}`;
-};
