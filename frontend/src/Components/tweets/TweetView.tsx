@@ -25,7 +25,7 @@ const TweetView: React.FC<Props> = ({ tweet }) => {
         <div style={{ width: 8, minWidth: 8, marginRight: 10, borderRadius: 4, backgroundColor: color, flexBasis: 8 }}></div>
 
         {/* Tweet display */}
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", flexGrow: 1, flexDirection: "column", justifyContent: "space-between" }}>
           {/* Content of the tweet */}
           <div>{truncate(tweet.message, 140)}</div>
 
