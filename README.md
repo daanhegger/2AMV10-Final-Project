@@ -7,13 +7,15 @@
 
 **Backend: Python/Flask REST API**
 
-1. _Optional_: create a venv
-2. Install pip dependencies `pip install -r requirements.txt`
-3. Install Spacy english language model `python -m spacy download en_core_web_lg`
-4. Start the server: `FLASK_APP=main.py flask run`
-5. _Optional_ Start the server in development mode: `FLASK_APP=main.py FLASK_ENV=development flask run`
+1. `cd backend`
+2. _Optional_: create a venv
+3. Install pip dependencies `pip install -r requirements.txt`
+4. Install Spacy english language model `python -m spacy download en_core_web_lg`
+5. Start the server: `FLASK_APP=main.py flask run`
+6. _Optional_ Start the server in development mode: `FLASK_APP=main.py FLASK_ENV=development flask run`
 
 **Frontend: ReactJS Web Application**
 
-1. Install dependencies: `yarn install`
-2. Run in development mode: `yarn run start`
+1. `cd frontend`
+2. Install dependencies: `yarn install`
+3. Run in development mode: `yarn run start`
