@@ -5,6 +5,8 @@
 
 ## Quick start
 
+The tool is split into a front- and backend and communication happens over HTTP. The application is stateless, which means that all user-configuration is stored in the browser.
+
 **Backend: Python/Flask REST API**
 
 1. `cd backend`
