@@ -1,4 +1,5 @@
-# 2AMV10
+# 2AMV10 - Final Project
+*A Visual Analytics tool for reconstructing a timeline of events from tweet-like data*
 
 ## Backend
 
