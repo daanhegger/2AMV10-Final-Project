@@ -11,10 +11,7 @@ from preprocess import init_df, df
 # Load .env variables
 load_dotenv()
 
-dataset_path = os.environ.get('DATASET_PATH')
-
-if not dataset_path or not path.exists(dataset_path):
-    raise ValueError("You need to set DATASET_PATH")
+dataset_path = path.join(os.getcwd(), "./YInt.csv")
 
 init_df(dataset_path)
 print("Loaded dataset into memory")
