@@ -60,7 +60,12 @@ const FindTerms: React.FC<Props> = ({ addTerm, alreadyAddedTerms }) => {
         value={query}
         loading={loading || word2vecAxios.loading}
         freeSolo
-        onChange={(e, newValue) => setQuery(newValue || "")}
+        onChange={(e, newValue) => {
+          // Add the term you are searching for
+          addTerm(newValue);
+          // And search for similar words in dictionary
+          setQuery(newValue || "");
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
