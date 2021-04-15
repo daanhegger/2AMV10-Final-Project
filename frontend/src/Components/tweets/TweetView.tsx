@@ -16,13 +16,15 @@ const TweetView: React.FC<Props> = ({ tweet }) => {
 
   const hasTopic = tweet.topics.length > 0;
 
-  const color = tweet.topics.length > 0 ? tweet.topics[0].color : "#FFF";
+  const colors = tweet.topics.length > 0 ? tweet.topics.map((t) => t.color) : ["#FFF"];
 
   return (
     <Tooltip title={`Topic(s): ${tweet.topics.map((t) => t.title).join(", ")}`} disableHoverListener={!hasTopic} placement={"left"}>
       <div style={{ minHeight: 80, width: "100%", display: "flex", alignItems: "stretch" }}>
         {/* Color indicator */}
-        <div style={{ width: 8, minWidth: 8, marginRight: 10, borderRadius: 4, backgroundColor: color, flexBasis: 8 }}></div>
+        {colors.map((c) => (
+          <div key={c} style={{ width: 8, minWidth: 8, marginRight: 4, borderRadius: 4, backgroundColor: c, flexBasis: 8 }}></div>
+        ))}
 
         {/* Tweet display */}
         <div style={{ display: "flex", flexGrow: 1, flexDirection: "column", justifyContent: "space-between" }}>
