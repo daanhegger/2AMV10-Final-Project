@@ -1,6 +1,6 @@
 import { Button, Grid } from "@material-ui/core";
 import useAxios from "axios-hooks";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import HeatMapCity from "./HeatMapCity";
 import { AppContext } from "../../context/topicsContext";
 import moment from "moment";
@@ -18,14 +18,19 @@ interface Props {
 
 const HeatMapView: React.FC<Props> = ({ frequencyType, frequencyAmount, startWindow, endWindow, selectedRegion, setRegion }) => {
   const { topics } = useContext(AppContext);
-  const [{ data, error, loading }] = useAxios({
+  const [{ data, error, loading }, refetch] = useAxios({
     url: "http://localhost:5000/heatmap",
     params: { freq_type: frequencyType, freq_amount: frequencyAmount },
     method: "POST",
     data: topics,
   });
 
-  if (loading) return <p>Loading data for heatmaps...</p>;
+  // When user changes topics in react app, refetch api to get new data per topics
+  useEffect(() => {
+    refetch();
+  }, [refetch, topics]);
+
+  if (loading || topics.length !== Object.keys(data).length) return <p>Loading data for heatmaps...</p>;
   if (error) return <p>Error fetching data for heatmaps...</p>;
 
   const dataSorted = new Array(topics.length).fill(0);
